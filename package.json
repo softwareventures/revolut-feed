@@ -15,7 +15,6 @@
   "homepage": "https://github.com/softwareventures/revolut-feed",
   "bugs": "https://github.com/softwareventures/revolut-feed",
   "repository": "github:softwareventures/revolut-feed",
-  "license": "ISC",
   "scripts": {
     "prepare": "tsc",
     "semantic-release": "semantic-release",
