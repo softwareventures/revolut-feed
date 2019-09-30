@@ -44,6 +44,6 @@ function createSignedJWT(): string {
 }
 
 
-open(PERMIT_ACCESS_URL);
+void open(PERMIT_ACCESS_URL);
 console.log(API_ROOT);
 console.log(createSignedJWT());
