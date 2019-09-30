@@ -25,7 +25,8 @@
     "@types/jsonwebtoken": "^8.3.4",
     "@types/node": "12.11.7",
     "dotenv": "^8.1.0",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "open": "^6.4.0"
   },
   "devDependencies": {
     "@softwareventures/tsconfig": "2.0.0",
