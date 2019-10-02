@@ -3,27 +3,21 @@ import * as dotenv from "dotenv";
 import fs = require("fs");
 import jwt = require("jsonwebtoken");
 import open = require("open");
+import {Client} from "./revolut-api/client";
 
 // Inits .env file, making it accessible in process.env
 dotenv.config();
 
 // Define some constants we are going to use for the script
-const CLIENT_ID = process.env.CLIENT_ID;
-const LOCALHOST = "127.0.0.1";
-
-let SUB_DOMAIN: string;
-let API_SUB_DOMAIN: string;
-
-if (process.env.NODE_DEV) { // TODO: Document this behaviour in readme to help Dan with testing
-    API_SUB_DOMAIN = "sandbox-b2b";
-    SUB_DOMAIN = "sandbox-business";
+let CLIENT_ID: string;
+if (process.env.CLIENT_ID) {
+    CLIENT_ID = process.env.CLIENT_ID;
 } else {
-    API_SUB_DOMAIN = "b2b";
-    SUB_DOMAIN = "business";
+    throw new Error("CLIENT_ID environment variable not set, can't continue...");
 }
 
-const PERMIT_ACCESS_URL = `https://${SUB_DOMAIN}.revolut.com/app-confirm?client_id=${CLIENT_ID}&redirect_uri=http://${LOCALHOST}`;
-const API_ROOT = `https://${API_SUB_DOMAIN}.revolut.com/api/1.0/`;
+const LOCALHOST = "127.0.0.1";
+const dev: boolean = !!process.env.NODE_DEV;
 
 
 /**
@@ -43,7 +37,6 @@ function createSignedJWT(): string {
     return jwt.sign(payload, privateKey, { algorithm: "RS256", expiresIn: 60 * 60});
 }
 
-
-void open(PERMIT_ACCESS_URL);
-console.log(API_ROOT);
+const client = new Client(CLIENT_ID, dev);
+void open(client.authenticate());
 console.log(createSignedJWT());
