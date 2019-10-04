@@ -24,12 +24,9 @@ export class HTTPHelper {
     }
 
     public exchangeAccessCode(authCode: string, clientId: string, jwt: string): void {
-        // FIXME: The request stuff is broken. Can't get the client to auth in postman either. Need to come back to this
         const endpoint: string = "auth/token";
         const apiUrl: string = this.API_ROOT + endpoint;
-        console.log(apiUrl);
-        const options = {
-            method: "POST",
+        const options = { method: "POST",
             url: apiUrl,
             form: {
                 grant_type: "authorization_code",
@@ -37,16 +34,14 @@ export class HTTPHelper {
                 client_id: clientId,
                 client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                 client_assertion: jwt
-            },
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
             }
         };
-        request(options, function optionalCallback(err, httpResponse, body): JSON | void {
-            if (err || httpResponse.statusCode !== 200) {
-                return console.error("upload failed with", httpResponse.statusCode, ":", err, body);
-            }
-            console.log("Upload successful!  Server responded with:", body);
+        request(options, (error, response, body) => {
+            if (error) {throw new Error(error); }
+            const responseJson: JSON = JSON.parse(response.body);
+            return responseJson;
         });
+        // FIXME: Fix callback return from the async function above so we can grab the response
+        console.log("HELLO");
     }
 }

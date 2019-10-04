@@ -25,7 +25,7 @@ export class Client {
         // If it doesn't or we don't have it, then get access url and get access code
         // This function should set the token for the object
         const jwt: string = this.createSignedJWT();
-        const authCode: string = "THIS_IS_A_DEBUG_PLACEHOLDER";
+        const authCode: string = "FAKE";
         this.http.exchangeAccessCode(authCode, this.clientId, jwt);
         return jwt;
     }
