@@ -2,9 +2,53 @@
 
 import fs = require("fs");
 import jwt = require("jsonwebtoken");
+import readline = require("readline");
 import {HTTPHelper} from "./http";
 
+
+const FILENAME = "./access_token.json";
+
+
+export interface AccessToken {
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+    refresh_token: string;
+}
+// TODO: Token refresh
+// TODO: Figuring out we need to reauth
+
+function readToken(): AccessToken | false {
+    try {
+        const rawData = fs.readFileSync(FILENAME, "utf-8");
+        const data = JSON.parse(rawData);
+        return data as AccessToken;
+    } catch (err) {
+        return false;
+    }
+}
+
+function setToken(token: AccessToken): void {
+    fs.writeFileSync(FILENAME, JSON.stringify(token));
+}
+
+function getAccessCode(): Promise<string> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    // TODO: Figure out why the below prints when it isn't called
+    return new Promise(resolve => {
+        rl.question("Enter Access Code: ", (accessCode) => {
+            rl.close();
+            resolve(accessCode);
+        });
+    });
+}
+
+
 export class Client {
+    private authenicated: boolean;
     private readonly clientId: string;
     private readonly dev: boolean;
     private readonly localhost: string;
@@ -15,20 +59,33 @@ export class Client {
         this.dev = dev;
         this.localhost = "127.0.0.1";
         this.http = new HTTPHelper(this.clientId, this.dev);
+        this.authenicated = false;
+    }
+    public async authenticate(): Promise<boolean> {
+        const token: AccessToken | false = readToken();
+        console.log(token);
+        if (!token) {
+            console.log("hello");
+            const jwt: string = this.createSignedJWT();
+            const authCode = await getAccessCode();
+            const response = await this.http.exchangeAccessCode(String(authCode), this.clientId, jwt);
+            setToken(response);
+            this.authenicated = true;
+            return true;
+        } else {
+            console.log("world");
+            this.authenicated = true;
+            return true;
+        }
+    }
+    public async get_accounts(): Promise<JSON> {
+        const token: AccessToken | false = readToken();
+        if (!this.authenicated) {
+            throw new Error("Not Authenticated");
+        }
+        return await this.http.getAccounts(token as AccessToken);
     }
 
-    public authenticate(): string {
-        // Just returning the access url for now as a test that all of the new modules work.
-        // TODO: Finish this function
-        // Check if authenticated, if so, return true.
-        // If not, check if we have a refresh token atm, if we do, just use that and hope it works
-        // If it doesn't or we don't have it, then get access url and get access code
-        // This function should set the token for the object
-        const jwt: string = this.createSignedJWT();
-        const authCode: string = "FAKE";
-        this.http.exchangeAccessCode(authCode, this.clientId, jwt);
-        return jwt;
-    }
     /**
      * Creates a json web token (JWT)
      * returns signed jwt

@@ -1,4 +1,5 @@
-import request = require("request");
+import request = require("request-promise-native");
+import {AccessToken} from "./client";
 
 
 export class HTTPHelper {
@@ -23,7 +24,7 @@ export class HTTPHelper {
         return `https://${this.SUB_DOMAIN}.revolut.com/app-confirm?client_id=${this.CLIENT_ID}&redirect_uri=http://${localHost}`;
     }
 
-    public exchangeAccessCode(authCode: string, clientId: string, jwt: string): void {
+    public exchangeAccessCode(authCode: string, clientId: string, jwt: string): request.RequestPromise {
         const endpoint: string = "auth/token";
         const apiUrl: string = this.API_ROOT + endpoint;
         const options = { method: "POST",
@@ -34,14 +35,20 @@ export class HTTPHelper {
                 client_id: clientId,
                 client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                 client_assertion: jwt
-            }
+            },
+            json: true
         };
-        request(options, (error, response, body) => {
-            if (error) {throw new Error(error); }
-            const responseJson: JSON = JSON.parse(response.body);
-            return responseJson;
-        });
-        // FIXME: Fix callback return from the async function above so we can grab the response
-        console.log("HELLO");
+        return request(options);
+    }
+    public getAccounts(token: AccessToken): request.RequestPromise {
+
+        const endpoint: string = "accounts";
+        const apiUrl: string = this.API_ROOT + endpoint;
+        const options = { method: "GET",
+            url: apiUrl,
+            headers: {Authorization: `Bearer ${token.access_token}`},
+            json: true
+        };
+        return request(options);
     }
 }

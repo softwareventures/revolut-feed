@@ -13,9 +13,15 @@ if (process.env.CLIENT_ID) {
 } else {
     throw new Error("CLIENT_ID environment variable not set, can't continue...");
 }
+console.log("sdss");
 
 const dev: boolean = !!process.env.NODE_DEV;
 
 const client = new Client(CLIENT_ID, dev);
-void client.authenticate();
+const authed = client.authenticate().then(bool => bool).catch(reason => {throw reason; });
+if (authed) {
+    console.log("successfully authenticated");
+}
+const accounts = client.get_accounts().then(accounts => accounts);
+console.log(accounts);
 // void open();
