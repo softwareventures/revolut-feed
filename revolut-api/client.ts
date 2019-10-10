@@ -3,6 +3,7 @@
 import fs = require("fs");
 import jwt = require("jsonwebtoken");
 import readline = require("readline");
+import {Account} from "./account";
 import {HTTPHelper} from "./http";
 
 
@@ -63,9 +64,7 @@ export class Client {
     }
     public async authenticate(): Promise<boolean> {
         const token: AccessToken | false = readToken();
-        console.log(token);
         if (!token) {
-            console.log("hello");
             const jwt: string = this.createSignedJWT();
             const authCode = await getAccessCode();
             const response = await this.http.exchangeAccessCode(String(authCode), this.clientId, jwt);
@@ -73,12 +72,11 @@ export class Client {
             this.authenicated = true;
             return true;
         } else {
-            console.log("world");
             this.authenicated = true;
             return true;
         }
     }
-    public async get_accounts(): Promise<JSON> {
+    public async get_accounts(): Promise<Account[]> {
         const token: AccessToken | false = readToken();
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
