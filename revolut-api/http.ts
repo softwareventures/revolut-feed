@@ -2,17 +2,8 @@
 import fs = require("fs");
 import jwt = require("jsonwebtoken");
 import request = require("request-promise-native");
-import {AccessToken} from "./client";
+import {AccessToken, Options} from "./types";
 
-/**
- * Basic object definition for get requests' options using the request lib
- */
-interface Options {
-    headers: { Authorization: string };
-    method: "GET";
-    json: true;
-    url: string;
-}
 
 /**
  * Class to wrap all http requests with to make code simpler

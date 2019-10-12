@@ -2,22 +2,9 @@
 
 import fs = require("fs");
 import readline = require("readline");
-import {Account} from "./account";
 import {HTTPHelper} from "./http";
+import {AccessToken, Account, RefreshToken} from "./types";
 
-
-export interface AccessToken {
-    access_token: string;
-    token_type: string;
-    expires_in: number;
-    refresh_token: string;
-}
-
-interface RefreshToken {
-    access_token: string;
-    token_type: string;
-    expires_in: number;
-}
 
 // TODO: Figuring out we need to reauth
 // TODO: Create file to manage io

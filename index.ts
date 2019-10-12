@@ -1,6 +1,7 @@
 
 import * as dotenv from "dotenv";
-import {Client} from "./revolut-api/client";
+import revolut = require("./revolut-api");
+
 
 // Inits .env file, making it accessible in process.env
 dotenv.config();
@@ -15,7 +16,7 @@ if (process.env.CLIENT_ID) {
 
 const dev: boolean = !!process.env.NODE_DEV;
 
-const client = new Client(CLIENT_ID, dev);
+const client = new revolut.Client(CLIENT_ID, dev);
 client.authenticate()
     .then(authed => {
         if (authed) {
