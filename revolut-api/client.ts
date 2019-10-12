@@ -1,4 +1,3 @@
-// Client class to wrap all interactions with the api
 
 import fs = require("fs");
 import readline = require("readline");
@@ -9,6 +8,10 @@ import {AccessToken, Account, RefreshToken} from "./types";
 // TODO: Figuring out we need to reauth
 // TODO: Create file to manage io
 
+
+/**
+ * Handles the terminal input for the access code from the user
+ */
 function getAccessCode(): Promise<string> {
     const rl = readline.createInterface({
         input: process.stdin,
@@ -22,6 +25,9 @@ function getAccessCode(): Promise<string> {
     });
 }
 
+/**
+ * Client class to wrap all interactions with the api
+ */
 export class Client {
     private readonly filename: string;
     private readonly clientId: string;
@@ -38,6 +44,10 @@ export class Client {
         this.filename = "./access_token.json";
         this.token = this.readToken() as AccessToken;
     }
+    /**
+     * Authenticates with the Revolut API. Needs to be called before using anything else in the client.
+     * Returns true if the client is authenticated
+     */
     public async authenticate(): Promise<boolean> {
         const token: AccessToken | false = this.readToken();
         if (!token) {
@@ -52,6 +62,10 @@ export class Client {
             return true;
         }
     }
+    /**
+     * Gets all of the users bank accounts
+     * Returns an array of account objects
+     */
     public async getAccounts(): Promise<Account[]> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
@@ -59,6 +73,10 @@ export class Client {
         console.log(this.token);
         return await this.http.getAccounts(this.token);
     }
+    /**
+     * Reads token from disk
+     * Returns AccessToken or false depending on if the token was able to be loaded
+     */
     private readToken(): AccessToken | false {
         try {
             const rawData = fs.readFileSync(this.filename, "utf-8");
@@ -68,16 +86,26 @@ export class Client {
             return false;
         }
     }
+    /**
+     * Sets the given AccessToken object as the one stored on disk
+     */
     private setToken(token: AccessToken): void {
         fs.writeFileSync(this.filename, JSON.stringify(token));
     }
+    /**
+     * Refresh the access token asynchronously
+     * Returns a void promise
+     */
     private async refreshToken(): Promise<void> {
         return this.getRefreshToken().then(refreshToken => {
-            console.log(refreshToken);
             this.token.access_token = refreshToken.access_token;
             this.setToken(this.token);
         });
     }
+    /**
+     * Makes the http call to refresh the access token
+     * Returns a RefreshToken object promise
+     */
     private getRefreshToken(): Promise<RefreshToken> {
         return this.http.refreshToken(this.token.refresh_token);
     }
