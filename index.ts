@@ -1,6 +1,5 @@
 
 import * as dotenv from "dotenv";
-// import open = require("open");
 import {Client} from "./revolut-api/client";
 
 // Inits .env file, making it accessible in process.env
