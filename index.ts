@@ -23,13 +23,13 @@ client.authenticate()
             console.log("successfully authenticated");
         }
 
-        return client.get_accounts();
+        return client.getAccounts();
     })
     .then(accounts => {
-        console.log(typeof accounts[0]);
+        console.log(accounts[0]);
         // return open();
     })
     .catch(reason => {
         console.error("", reason);
-        process.exit(1);
+        process.exit(5);
     });
