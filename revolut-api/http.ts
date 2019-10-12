@@ -117,6 +117,7 @@ export class HTTPHelper {
      * returns RequestPromise
      */
     public getTransactions(token: AccessToken): request.RequestPromise {
+        // TODO: Add optional filtering to this function to match the what the api can do.
         const endpoint: string = "transactions";
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);

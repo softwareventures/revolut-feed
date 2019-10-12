@@ -2,7 +2,7 @@
 import fs = require("fs");
 import readline = require("readline");
 import {HTTPHelper} from "./http";
-import {AccessToken, Account, RefreshToken} from "./types";
+import {AccessToken, Account, Counterparty, RefreshToken, Transaction} from "./types";
 
 
 // TODO: Figuring out we need to reauth
@@ -64,14 +64,54 @@ export class Client {
     }
     /**
      * Gets all of the users bank accounts
-     * Returns an array of account objects
+     * Returns promise of an array of Account objects
      */
     public async getAccounts(): Promise<Account[]> {
         if (!this.authenicated) {
+            throw new Error("Not Authenticated"); // TODO: Fix this code duplication
+        }
+        return await this.http.getAccounts(this.token);
+    }
+    /**
+     * Gets all of the counterparties of the user
+     * Returns promise of an array of Counterparty objects
+     */
+    public async getCounterparties(): Promise<Counterparty[]> {
+        if (!this.authenicated) {
             throw new Error("Not Authenticated");
         }
-        console.log(this.token);
-        return await this.http.getAccounts(this.token);
+        return await this.http.getCounterparties(this.token);
+    }
+    /**
+     * Gets the counterparty with the specified ID
+     * Returns promise of a Countyparty object
+     */
+    public async getCounterparty(id: string): Promise<Counterparty> {
+        if (!this.authenicated) {
+            throw new Error("Not Authenticated");
+        }
+        return await this.http.getCounterparty(this.token, id);
+    }
+    /**
+     * Gets transactions from this user with the given filters
+     * The default limit of the api is 100, the max is 1000.
+     * Returns promise of an array of Transaction objects
+     */
+    public async getTransactions(): Promise<Transaction[]> {
+        if (!this.authenicated) {
+            throw new Error("Not Authenticated");
+        }
+        return await this.http.getTransactions(this.token);
+    }
+    /**
+     * Gets the Transaction with the specified ID
+     * Returns promise of a Transaction object
+     */
+    public async getTransaction(id: string): Promise<Transaction> {
+        if (!this.authenicated) {
+            throw new Error("Not Authenticated");
+        }
+        return await this.http.getTransaction(this.token, id);
     }
     /**
      * Reads token from disk

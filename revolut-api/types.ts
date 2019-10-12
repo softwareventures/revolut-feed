@@ -41,3 +41,71 @@ export interface Account {
     updated_at: string;
     created_at: string;
 }
+
+/**
+ * Object of counterparties account data from the api
+ */
+export interface CounterpartyAccount {
+    id: string;
+    currency: string;
+    type: string;
+    account_no: string;
+    sort_code: string;
+    email: string;
+    name: string;
+    bank_country: string;
+    recipient_charges: string;
+}
+
+/**
+ * Object representing counterparties
+ */
+export interface Counterparty {
+    id: string;
+    name: string;
+    phone: string;
+    profile_type: string;
+    country: string;
+    state: string;
+    created_at: string;
+    updated_at: string;
+    accounts: CounterpartyAccount[];
+}
+
+/**
+ * Object representing a counterparty from a transaction
+ */
+export interface TransactionCounterparty {
+    id: string;
+    type: string;
+    account_id: string;
+}
+
+/**
+ * Object representing a leg from a transaction
+ */
+export interface Leg {
+    leg_id: string;
+    account_id: string;
+    counterparty: TransactionCounterparty;
+    amount: number;
+    currency: string;
+    description: string;
+    balance: number;
+}
+
+/**
+ * Object representing a transaction
+ */
+export interface Transaction {
+    id: string;
+    type: string;
+    request_id: string;
+    state: string;
+    created_at: string;
+    updated_at: string;
+    completed_at: string;
+    reference: string;
+    legs: Leg[];
+    scheduled_for: string;
+}
