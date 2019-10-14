@@ -1,9 +1,10 @@
 
+import * as csv from "@softwareventures/csv";
+import {recordsToTable} from "@softwareventures/table";
 import program = require("commander");
-// import * as csv from "@softwareventures/csv";
+import {ReadonlyDictionary} from "dictionary-types";
 import * as dotenv from "dotenv";
 import revolut = require("./revolut-api");
-// import {recordsToTable} from "@softwareventures/table";
 
 
 // Parse command line args
@@ -26,14 +27,6 @@ if (!CLIENT_ID) {
 const dev = !!program.debug;
 const client = new revolut.Client(CLIENT_ID, dev);
 
-// @ts-ignore
-// interface Table {
-//     Date: string;
-//     Description: string;
-//     Net: string;
-//     Balance: string;
-// }
-
 // General flow
 // Get GBP account
 // Get transactions for account with the params given
@@ -43,18 +36,56 @@ const client = new revolut.Client(CLIENT_ID, dev);
 // replace info for this transaction for the exchange entry
 // write to csv
 
+function reverseDateFormat(date: string): string {
+    const oldDate: string = date.split("T")[0];
+    const dateArray = oldDate.split("-");
+    return dateArray.reverse().join("/");
+}
+
+function getLeg(legs: revolut.Leg[]): revolut.Leg {
+    if (legs.length === 1) {
+        return legs[0];
+    }
+    for (const leg of legs) {
+        if (leg.currency === "GBP") {
+            return leg;
+        }
+    }
+    throw new Error("User has no GBP account...");
+}
+
+function createTables(acc: revolut.Account, transactions: revolut.Transaction[]): Array<ReadonlyDictionary<string>> {
+    const tableRows: Array<ReadonlyDictionary<string>> = [];
+    for (const transaction of transactions.reverse()) {
+        const leg: revolut.Leg = getLeg(transaction.legs);
+        // This avoids undefined variable from failed transactions and transactions not in the GBP account
+        if (transaction.completed_at && acc.id === leg.account_id) {
+            const row: ReadonlyDictionary<string> = {
+                Date: reverseDateFormat(transaction.completed_at),
+                Description: transaction.reference,
+                Net: leg.amount.toString(),
+                Balance: leg.balance.toString()
+            };
+            tableRows.push(row);
+        }
+    }
+    return tableRows;
+}
+
 // Main Flow
 client.authenticate()
     .then(authed => {
         if (authed) {
-            console.log("successfully authenticated");
+            console.log("successfully authed");
         }
-
-        return client.getTransactions();
+        // This assumes the user has only one GBP account
+        return client.getGBPAccount();
     })
-    .then(trans => {
+    .then(async account => {
         // Write to csv here
-        console.log(trans[0]);
+        const transactions = await client.getTransactions("", "", 1000);
+        const rows = createTables(account, transactions);
+        console.log(csv.write(recordsToTable(rows)));
     })
     .catch(reason => {
         console.error("", reason);

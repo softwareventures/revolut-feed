@@ -30,6 +30,7 @@
     "@types/request": "^2.48.3",
     "@types/request-promise-native": "^1.0.17",
     "commander": "^3.0.2",
+    "dictionary-types": "^1.0.0",
     "dotenv": "^8.1.0",
     "jsonwebtoken": "^8.5.1",
     "request": "^2.88.0",

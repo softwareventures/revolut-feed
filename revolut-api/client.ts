@@ -63,56 +63,72 @@ export class Client {
         }
     }
     /**
+     * Assuming the user has only one GBP account, gets that account
+     * Returns promise of of an Account object
+     */
+    public getGBPAccount(): Promise<Account> {
+        return this.getAccounts()
+            .then(accounts => {
+                for (const account of accounts) {
+                    if (account.currency === "GBP") {
+                        return account;
+                    }
+                }
+                // Most likely will never reach here but exists to avoid the possibility of returning void
+                throw new Error("No GBP account for logged in user.");
+            });
+    }
+    /**
      * Gets all of the users bank accounts
      * Returns promise of an array of Account objects
      */
-    public async getAccounts(): Promise<Account[]> {
+    public getAccounts(): Promise<Account[]> {
         if (!this.authenicated) {
-            throw new Error("Not Authenticated"); // TODO: Fix this code duplication
+            throw new Error("Not Authenticated"); // TODO: Fix this code duplication - Standardise errors
         }
-        return await this.http.getAccounts(this.token);
+        return this.http.getAccounts(this.token);
     }
     /**
      * Gets all of the counterparties of the user
      * Returns promise of an array of Counterparty objects
      */
-    public async getCounterparties(): Promise<Counterparty[]> {
+    public getCounterparties(): Promise<Counterparty[]> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
         }
-        return await this.http.getCounterparties(this.token);
+        return this.http.getCounterparties(this.token);
     }
     /**
      * Gets the counterparty with the specified ID
      * Returns promise of a Countyparty object
      */
-    public async getCounterparty(id: string): Promise<Counterparty> {
+    public getCounterparty(id: string): Promise<Counterparty> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
         }
-        return await this.http.getCounterparty(this.token, id);
+        return this.http.getCounterparty(this.token, id);
     }
     /**
      * Gets transactions from this user with the given filters
      * The default limit of the api is 100, the max is 1000.
      * Returns promise of an array of Transaction objects
      */
-    public async getTransactions(from?: string, to?: string, count?: number,
-                                 counterpartyID?: string): Promise<Transaction[]> {
+    public getTransactions(from?: string, to?: string, count?: number,
+                           counterpartyID?: string): Promise<Transaction[]> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
         }
-        return await this.http.getTransactions(this.token, from, to, count, counterpartyID);
+        return this.http.getTransactions(this.token, from, to, count, counterpartyID);
     }
     /**
      * Gets the Transaction with the specified ID
      * Returns promise of a Transaction object
      */
-    public async getTransaction(id: string): Promise<Transaction> {
+    public getTransaction(id: string): Promise<Transaction> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
         }
-        return await this.http.getTransaction(this.token, id);
+        return this.http.getTransaction(this.token, id);
     }
     /**
      * Reads token from disk
