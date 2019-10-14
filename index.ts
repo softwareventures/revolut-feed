@@ -3,6 +3,8 @@ import program = require("commander");
 import * as dotenv from "dotenv";
 import revolut = require("./revolut-api");
 
+// Parse command line args
+// Needs program name and description
 program
     .option("-d, --debug", "connects and uses the sandbox environment")
     .option("-f, --from <date>", "date for beginning of transaction search [Format yyyy/mm/dd]")
@@ -10,7 +12,6 @@ program
 
 program.parse(process.argv);
 
-console.log(program.debug);
 // Inits .env file, making it accessible in process.env
 dotenv.config();
 
