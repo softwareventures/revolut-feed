@@ -131,7 +131,6 @@ export class HTTPHelper {
         if (counterpartyID) {
             endpoint += "counterparty=" + counterpartyID;
         }
-        console.log(endpoint);
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }
