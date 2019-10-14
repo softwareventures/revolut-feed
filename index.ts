@@ -5,8 +5,8 @@ import revolut = require("./revolut-api");
 
 program
     .option("-d, --debug", "connects and uses the sandbox environment")
-    .option("-f, --from <date>", "date for beginning of transaction search")
-    .option("-t, --to <date>", "date for the end of the transaction search (defaults to 'now' if not given)");
+    .option("-f, --from <date>", "date for beginning of transaction search [Format yyyy/mm/dd]")
+    .option("-t, --to <date>", "date for the end of the transaction search [Format yyyy/mm/dd] (defaults to 'now' if not given)");
 
 program.parse(process.argv);
 
