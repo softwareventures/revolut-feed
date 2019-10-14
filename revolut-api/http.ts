@@ -116,9 +116,22 @@ export class HTTPHelper {
      * Makes request to get all transactions for user
      * returns RequestPromise
      */
-    public getTransactions(token: AccessToken): request.RequestPromise {
-        // TODO: Add optional filtering to this function to match the what the api can do.
-        const endpoint: string = "transactions";
+    public getTransactions(token: AccessToken, from?: string, to?: string, count?: number,
+                           counterpartyID?: string): request.RequestPromise {
+        let endpoint: string = "transactions?";
+        if (from) {
+            endpoint += "from=" + from;
+        }
+        if (to) {
+            endpoint += "to=" + to;
+        }
+        if (count as number >= 1) {  // If count is more than 0
+            endpoint += "count=" + count;
+        }
+        if (counterpartyID) {
+            endpoint += "counterparty=" + counterpartyID;
+        }
+        console.log(endpoint);
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }

@@ -23,10 +23,10 @@ client.authenticate()
             console.log("successfully authenticated");
         }
 
-        return client.getAccounts();
+        return client.getTransactions();
     })
-    .then(accounts => {
-        console.log(accounts[0]);
+    .then(trans => {
+        console.log(trans[0].legs);
         // return open();
     })
     .catch(reason => {

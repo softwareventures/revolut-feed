@@ -97,11 +97,12 @@ export class Client {
      * The default limit of the api is 100, the max is 1000.
      * Returns promise of an array of Transaction objects
      */
-    public async getTransactions(): Promise<Transaction[]> {
+    public async getTransactions(from?: string, to?: string, count?: number,
+                                 counterpartyID?: string): Promise<Transaction[]> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
         }
-        return await this.http.getTransactions(this.token);
+        return await this.http.getTransactions(this.token, from, to, count, counterpartyID);
     }
     /**
      * Gets the Transaction with the specified ID
