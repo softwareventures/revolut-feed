@@ -9,6 +9,7 @@ import revolut = require("./revolut-api");
 
 
 // Parse command line args
+// TODO: Add way to install this script to node-bin
 program
     .name("revolut-feed")
     .description("Experimental feed of transactions from Revolut")
