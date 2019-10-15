@@ -118,6 +118,7 @@ export class Client {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
         }
+        // Limit of the api for count is 1000, going to struggle if we need to get more than this
         return this.http.getTransactions(this.token, from, to, count, counterpartyID);
     }
     /**

@@ -4,15 +4,19 @@ import {recordsToTable} from "@softwareventures/table";
 import program = require("commander");
 import {ReadonlyDictionary} from "dictionary-types";
 import * as dotenv from "dotenv";
+import fs = require("fs");
 import revolut = require("./revolut-api");
 
 
 // Parse command line args
-// Needs program name and description
 program
+    .name("revolut-feed")
+    .description("Experimental feed of transactions from Revolut")
+    .version("0.0.0-development", "-v, --version", "output the current version") // Maybe read this from package.json
     .option("-d, --debug", "connects and uses the sandbox environment")
+    .option("-o, --output <name>", "/path/to/output csv filename", "revolut-feed.csv")
     .option("-f, --from <date>", "date for beginning of transaction search [Format yyyy/mm/dd]")
-    .option("-t, --to <date>", "date for the end of the transaction search [Format yyyy/mm/dd] (defaults to 'now' if not given)");
+    .option("-t, --to <date>", "date for the end of the transaction search [Format yyyy/mm/dd] (default: 'now' [today's date])");
 
 program.parse(process.argv);
 
@@ -85,7 +89,8 @@ client.authenticate()
         // Write to csv here
         const transactions = await client.getTransactions("", "", 1000);
         const rows = createTables(account, transactions);
-        console.log(csv.write(recordsToTable(rows)));
+        fs.writeFileSync(program.output, csv.write(recordsToTable(rows)));
+        console.log("wrote csv to " + program.output);
     })
     .catch(reason => {
         console.error("", reason);
