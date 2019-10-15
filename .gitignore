@@ -10,3 +10,4 @@ npm-debug.log
 *.pem
 *.cer
 access_token.json
+*.csv
