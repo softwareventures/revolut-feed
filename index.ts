@@ -9,7 +9,6 @@ import revolut = require("./revolut-api");
 
 
 // Parse command line args
-// TODO: Add way to install this script to node-bin
 program
     .name("revolut-feed")
     .description("Experimental feed of transactions from Revolut")
@@ -30,7 +29,7 @@ if (!CLIENT_ID) {
     throw new Error("CLIENT_ID environment variable not set, can't continue...");
 }
 const dev = !!program.debug;
-const client = new revolut.Client(CLIENT_ID, dev);
+const client = new revolut.Client(CLIENT_ID, dev, process.env.SSL_PRIVATE_PATH as string);
 
 // General flow
 // Get GBP account
@@ -92,6 +91,7 @@ client.authenticate()
         const rows = createTables(account, transactions);
         fs.writeFileSync(program.output, csv.write(recordsToTable(rows)));
         console.log("wrote csv to " + program.output);
+        process.exit(0);
     })
     .catch(reason => {
         console.error("", reason);

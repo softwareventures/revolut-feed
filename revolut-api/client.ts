@@ -32,13 +32,15 @@ export class Client {
     private readonly filename: string;
     private readonly clientId: string;
     private readonly dev: boolean;
+    private readonly privateKey: string;
     private http: HTTPHelper;
     private authenicated: boolean;
     private token: AccessToken;
 
-    constructor(clientId: string, dev: boolean) {
+    constructor(clientId: string, dev: boolean, privateKey: string) {
         this.clientId = clientId;
         this.dev = dev;
+        this.privateKey = privateKey;
         this.http = new HTTPHelper(this.clientId, this.dev);
         this.authenicated = false;
         this.filename = "./access_token.json";
@@ -52,7 +54,7 @@ export class Client {
         const token: AccessToken | false = this.readToken();
         if (!token) {
             const authCode = await getAccessCode();
-            const response = await this.http.exchangeAccessCode(String(authCode));
+            const response = await this.http.exchangeAccessCode(authCode, this.privateKey);
             this.setToken(response);
             this.authenicated = true;
             return true;
@@ -149,6 +151,7 @@ export class Client {
      */
     private setToken(token: AccessToken): void {
         fs.writeFileSync(this.filename, JSON.stringify(token));
+        this.token = token;
     }
     /**
      * Refresh the access token asynchronously
@@ -165,6 +168,6 @@ export class Client {
      * Returns a RefreshToken object promise
      */
     private getRefreshToken(): Promise<RefreshToken> {
-        return this.http.refreshToken(this.token.refresh_token);
+        return this.http.refreshToken(this.token.refresh_token, this.privateKey);
     }
 }

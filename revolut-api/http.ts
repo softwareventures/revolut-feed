@@ -40,7 +40,7 @@ export class HTTPHelper {
      * Makes request to refresh access token
      * returns RequestPromise
      */
-    public refreshToken(refreshToken: string): request.RequestPromise {
+    public refreshToken(refreshToken: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
         const apiUrl: string = this.API_ROOT + endpoint;
         const options = { method: "POST",
@@ -50,7 +50,7 @@ export class HTTPHelper {
                 refresh_token: refreshToken,
                 client_id: this.CLIENT_ID,
                 client_assertion_type: this.clientAssertionType,
-                client_assertion: this.createSignedJWT()
+                client_assertion: this.createSignedJWT(privateKey)
             },
             json: true
         };
@@ -60,7 +60,7 @@ export class HTTPHelper {
      * Makes request exchange access code for more permanent access and refresh tokens
      * returns RequestPromise
      */
-    public exchangeAccessCode(authCode: string): request.RequestPromise {
+    public exchangeAccessCode(authCode: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
         const apiUrl: string = this.API_ROOT + endpoint;
         const options = { method: "POST",
@@ -70,7 +70,7 @@ export class HTTPHelper {
                 code: authCode,
                 client_id: this.CLIENT_ID,
                 client_assertion_type: this.clientAssertionType,
-                client_assertion: this.createSignedJWT()
+                client_assertion: this.createSignedJWT(privateKey)
             },
             json: true
         };
@@ -150,8 +150,7 @@ export class HTTPHelper {
      * Creates a json web token (JWT)
      * returns signed jwt
      */
-    private createSignedJWT(): string {
-        const privateKeyName = "privatekey.pem"; // Should be valid path to the private key
+    private createSignedJWT(privateKeyName: string): string {
         const privateKey = fs.readFileSync(privateKeyName);
         const issuer = this.localhost; // Issuer for JWT, should be derived from your redirect URL
         const revolutUrl = "https://revolut.com"; // Constant
