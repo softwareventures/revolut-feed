@@ -114,7 +114,7 @@ export class Client {
      * @param from specifies from what date the transaction search should start from
      * @param to specifies to what date the transaction search should end
      * @param count sets the limit for how many transactions should be in the search. This is 100 by default, 1000 max
-     * @param counterpartyID can filter the transaction search to only include transactions from specified countparties
+     * @param counterpartyID filters the transaction search to only include transactions from specified counterparties
      * Returns promise of an array of Transaction objects
      */
     public getTransactions(from?: string, to?: string, count?: number,
