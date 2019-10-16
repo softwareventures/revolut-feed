@@ -6,7 +6,6 @@ import {AccessToken, Account, Counterparty, RefreshToken, Transaction} from "./t
 
 
 // TODO: Figuring out we need to reauth
-// TODO: Create file to manage io
 
 
 /**
@@ -27,7 +26,7 @@ function getAccessCode(): Promise<string> {
 
 /**
  * Client class to wrap all interactions with the api
- */
+ */ // TODO: Add docs for args
 export class Client {
     private readonly filename: string;
     private readonly clientId: string;
@@ -114,7 +113,7 @@ export class Client {
      * Gets transactions from this user with the given filters
      * The default limit of the api is 100, the max is 1000.
      * Returns promise of an array of Transaction objects
-     */
+     */ // TODO: Add docs for args
     public getTransactions(from?: string, to?: string, count?: number,
                            counterpartyID?: string): Promise<Transaction[]> {
         if (!this.authenicated) {
@@ -126,7 +125,7 @@ export class Client {
     /**
      * Gets the Transaction with the specified ID
      * Returns promise of a Transaction object
-     */
+     */ // TODO: Add docs for args
     public getTransaction(id: string): Promise<Transaction> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
@@ -148,7 +147,7 @@ export class Client {
     }
     /**
      * Sets the given AccessToken object as the one stored on disk
-     */
+     */ // TODO: Add docs for args
     private setToken(token: AccessToken): void {
         fs.writeFileSync(this.filename, JSON.stringify(token));
         this.token = token;

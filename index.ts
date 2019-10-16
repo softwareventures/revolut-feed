@@ -29,7 +29,8 @@ if (!CLIENT_ID) {
     throw new Error("CLIENT_ID environment variable not set, can't continue...");
 }
 const dev = !!program.debug;
-const client = new revolut.Client(CLIENT_ID, dev, process.env.SSL_PRIVATE_PATH as string);
+const privateKey = process.env.SSL_PRIVATE_PATH as string;
+const client = new revolut.Client(CLIENT_ID, dev, privateKey);
 
 // General flow
 // Get GBP account
