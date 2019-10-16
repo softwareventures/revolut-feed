@@ -25,7 +25,7 @@ function getAccessCode(): Promise<string> {
  * @param clientId is the client_id as a string
  * @param boolean for if the program is in dev mode or not
  * @param privateKey is the path to the ssl private key
- */ // TODO: Add docs for args
+ */
 export class Client {
     private readonly filename: string;
     private readonly clientId: string;
@@ -111,8 +111,12 @@ export class Client {
     /**
      * Gets transactions from this user with the given filters
      * The default limit of the api is 100, the max is 1000.
+     * @param from specifies from what date the transaction search should start from
+     * @param to specifies to what date the transaction search should end
+     * @param count sets the limit for how many transactions should be in the search. This is 100 by default, 1000 max
+     * @param counterpartyID can filter the transaction search to only include transactions from specified countparties
      * Returns promise of an array of Transaction objects
-     */ // TODO: Add docs for args
+     */
     public getTransactions(from?: string, to?: string, count?: number,
                            counterpartyID?: string): Promise<Transaction[]> {
         if (!this.authenicated) {
