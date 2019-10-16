@@ -1,13 +1,15 @@
 
+/**
+ * @file Handles all http requests away from users
+ */
+
 import fs = require("fs");
 import jwt = require("jsonwebtoken");
 import request = require("request-promise-native");
 import {AccessToken, Options} from "./types";
 
 
-/**
- * Class to wrap all http requests with to make code simpler
- */
+/** Class to wrap all http requests with to make code simpler */
 export class HTTPHelper {
     public readonly SUB_DOMAIN: string;
     public readonly API_SUB_DOMAIN: string;
@@ -16,6 +18,11 @@ export class HTTPHelper {
     private readonly CLIENT_ID: string;
     private readonly clientAssertionType: string;
 
+    /**
+     * Creates a HTTPHelper class
+     * @param clientId - the client id from the revolut api app
+     * @param dev - true or false for if the client is in development mode
+     */
     constructor(clientId: string, dev: boolean) {
         this.CLIENT_ID = clientId;
         if (dev) {
@@ -30,15 +37,10 @@ export class HTTPHelper {
         this.localhost = "127.0.0.1";
     }
     /**
-     * Returns the generic revolut api access consent page for our app
-     * returns string
-     */
-    public getAccessUrl(): string {
-        return `https://${this.SUB_DOMAIN}.revolut.com/app-confirm?client_id=${this.CLIENT_ID}&redirect_uri=http://${this.localhost}`;
-    }
-    /**
      * Makes request to refresh access token
-     * returns RequestPromise
+     * @param refreshToken - the refresh token that is part of the AccessToken object
+     * @param privateKey - the path to private ssl key
+     * @return -  RequestPromise
      */
     public refreshToken(refreshToken: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
@@ -58,7 +60,9 @@ export class HTTPHelper {
     }
     /**
      * Makes request exchange access code for more permanent access and refresh tokens
-     * returns RequestPromise
+     * @param authCode - the auth code given after the user has given permission to the application
+     * @param privateKey - the path to private ssl key
+     * @return - RequestPromise
      */
     public exchangeAccessCode(authCode: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
@@ -78,7 +82,8 @@ export class HTTPHelper {
     }
     /**
      * Makes request to get all accounts for user
-     * returns RequestPromise
+     * @param token - the AccessToken object for the api
+     * @return - RequestPromise of accounts endpoint
      */
     public getAccounts(token: AccessToken): request.RequestPromise {
         const endpoint: string = "accounts";
@@ -87,7 +92,9 @@ export class HTTPHelper {
     }
     /**
      * Makes request to get counterparty with specified id
-     * returns RequestPromise
+     * @param token - the AccessToken object for the api
+     * @param id - the id of the counterparty
+     * @return - RequestPromise of counterparty endpoint
      */
     public getCounterparty(token: AccessToken, id: string): request.RequestPromise {
         const endpoint: string = `counterparty/${id}`;
@@ -96,7 +103,8 @@ export class HTTPHelper {
     }
     /**
      * Makes request to get all counterparties for user
-     * returns RequestPromise
+     * @param token - the AccessToken object for the api
+     * @return - RequestPromise of counterparties endpoint
      */
     public getCounterparties(token: AccessToken): request.RequestPromise {
         const endpoint: string = "counterparties";
@@ -105,7 +113,9 @@ export class HTTPHelper {
     }
     /**
      * Makes request to get transaction with specified id
-     * returns RequestPromise
+     * @param token - the AccessToken object for the api
+     * @param id - the id of the transaction
+     * @return - RequestPromise of transaction endpoint
      */
     public getTransaction(token: AccessToken, id: string): request.RequestPromise {
         const endpoint: string = `transaction/${id}`;
@@ -114,12 +124,12 @@ export class HTTPHelper {
     }
     /**
      * Makes request to get all transactions for user
-     * @param token is the access token for the api
-     * @param from specifies from what date the transaction search should start from
-     * @param to specifies to what date the transaction search should end
-     * @param count sets the limit for how many transactions should be in the search. This is 100 by default, 1000 max
-     * @param counterpartyID filters the transaction search to only include transactions from specified counterparties
-     * returns RequestPromise
+     * @param token - the AccessToken object for the api
+     * @param [from] - specifies from what date the transaction search should start from
+     * @param [to] - specifies to what date the transaction search should end
+     * @param [count] - sets limit for how many transactions should be in the search. This is 100 by default, 1000 max
+     * @param [counterpartyID] - filters transaction search to only include transactions from specified counterparties
+     * @return - promise of an array of Transaction objects
      */
     public getTransactions(token: AccessToken, from?: string, to?: string, count?: number,
                            counterpartyID?: string): request.RequestPromise {
@@ -141,7 +151,9 @@ export class HTTPHelper {
     }
     /**
      * Creates generic options for get requests for most of the revolut api
-     * returns Options
+     * @param endpoint - The endpoint for the api resource sans api root
+     * @param accessToken - the string of access token in the AccessToken object, not the object
+     * @return - Generic options object
      */
     private createGenericGetOptions(endpoint: string, accessToken: string): Options {
         return {
@@ -153,7 +165,8 @@ export class HTTPHelper {
     }
     /**
      * Creates a json web token (JWT)
-     * returns signed jwt
+     * @param privateKeyName - the path to private ssl key
+     * @return - signed jwt
      */
     private createSignedJWT(privateKeyName: string): string {
         const privateKey = fs.readFileSync(privateKeyName);

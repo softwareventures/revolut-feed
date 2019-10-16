@@ -41,12 +41,23 @@ const client = new revolut.Client(CLIENT_ID, dev, privateKey);
 // replace info for this transaction for the exchange entry
 // write to csv
 
+/**
+ * Reverses a date string from yyyy-mm-dd returned from the api to dd/mm/yyyy
+ * @param date - A string representation of a date yyyy-mm-dd
+ * @return - A string representation of a date dd/mm/yyyy
+ */
 function reverseDateFormat(date: string): string {
     const oldDate: string = date.split("T")[0];
     const dateArray = oldDate.split("-");
     return dateArray.reverse().join("/");
 }
 
+/**
+ * Sorts through an array of legs to get the GBP account leg
+ * @param legs - An array of Legs from an revolut transaction object
+ * @return - One leg from the transaction
+ * @throws an error if there is no GBP account with the user
+ */
 function getLeg(legs: revolut.Leg[]): revolut.Leg {
     if (legs.length === 1) {
         return legs[0];
@@ -59,7 +70,13 @@ function getLeg(legs: revolut.Leg[]): revolut.Leg {
     throw new Error("User has no GBP account...");
 }
 
-function createTables(acc: revolut.Account, transactions: revolut.Transaction[]): Array<ReadonlyDictionary<string>> {
+/**
+ * Creates an array of dictionaries representing csv transaction data
+ * @param acc - The users GBP account with revolut
+ * @param transactions - An array of transactions to insert into the csv table
+ * @return An array of dictionaries with string keys
+ */
+function createTable(acc: revolut.Account, transactions: revolut.Transaction[]): Array<ReadonlyDictionary<string>> {
     const tableRows: Array<ReadonlyDictionary<string>> = [];
     for (const transaction of transactions.reverse()) {
         const leg: revolut.Leg = getLeg(transaction.legs);
@@ -89,7 +106,7 @@ client.authenticate()
     .then(async account => {
         // Write to csv here
         const transactions = await client.getTransactions("", "", 1000);
-        const rows = createTables(account, transactions);
+        const rows = createTable(account, transactions);
         fs.writeFileSync(program.output, csv.write(recordsToTable(rows)));
         console.log("wrote csv to " + program.output);
         process.exit(0);

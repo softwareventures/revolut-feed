@@ -1,4 +1,8 @@
 
+/**
+ * @file Handles the client that users interact with the api with
+ */
+
 import fs = require("fs");
 import readline = require("readline");
 import {HTTPHelper} from "./http";
@@ -6,6 +10,7 @@ import {AccessToken, Account, Counterparty, RefreshToken, Transaction} from "./t
 
 /**
  * Handles the terminal input for the access code from the user
+ * @return - the user input as a string promise.
  */
 function getAccessCode(): Promise<string> {
     const rl = readline.createInterface({
@@ -20,12 +25,8 @@ function getAccessCode(): Promise<string> {
     });
 }
 
-/**
- * Client class to wrap all interactions with the api
- * @param clientId is the client_id as a string
- * @param boolean for if the program is in dev mode or not
- * @param privateKey is the path to the ssl private key
- */
+
+/** Client class to wrap all interactions with the api for the user */
 export class Client {
     private readonly filename: string;
     private readonly clientId: string;
@@ -35,6 +36,12 @@ export class Client {
     private authenicated: boolean;
     private token: AccessToken;
 
+    /**
+     * Create a client
+     * @param clientId - api's app ID from revolut
+     * @param dev - true if the program is being run in development mode
+     * @param privateKey - path to the sll private key
+     */
     constructor(clientId: string, dev: boolean, privateKey: string) {
         this.clientId = clientId;
         this.dev = dev;
@@ -46,7 +53,7 @@ export class Client {
     }
     /**
      * Authenticates with the Revolut API. Needs to be called before using anything else in the client.
-     * Returns true if the client is authenticated
+     * @return - true if the client is authenticated, false if it is not.
      */
     public async authenticate(): Promise<boolean> {
         const token: AccessToken | false = this.readToken();
@@ -64,7 +71,8 @@ export class Client {
     }
     /**
      * Assuming the user has only one GBP account, gets that account
-     * Returns promise of of an Account object
+     * @return - promise of of an Account object
+     * @throws error if the user has no GBP bank account
      */
     public getGBPAccount(): Promise<Account> {
         return this.getAccounts()
@@ -80,7 +88,8 @@ export class Client {
     }
     /**
      * Gets all of the users bank accounts
-     * Returns promise of an array of Account objects
+     * @return - promise of an array of Account objects
+     * @throws error if the client is not authenticated
      */
     public getAccounts(): Promise<Account[]> {
         if (!this.authenicated) {
@@ -90,7 +99,8 @@ export class Client {
     }
     /**
      * Gets all of the counterparties of the user
-     * Returns promise of an array of Counterparty objects
+     * @return - promise of an array of Counterparty objects
+     * @throws error if the client is not authenticated
      */
     public getCounterparties(): Promise<Counterparty[]> {
         if (!this.authenicated) {
@@ -100,7 +110,9 @@ export class Client {
     }
     /**
      * Gets the counterparty with the specified ID
-     * Returns promise of a Countyparty object
+     * @param id - the id of the counterparty
+     * @return - promise of a Countyparty object
+     * @throws error if the client is not authenticated
      */
     public getCounterparty(id: string): Promise<Counterparty> {
         if (!this.authenicated) {
@@ -111,11 +123,12 @@ export class Client {
     /**
      * Gets transactions from this user with the given filters
      * The default limit of the api is 100, the max is 1000.
-     * @param from specifies from what date the transaction search should start from
-     * @param to specifies to what date the transaction search should end
-     * @param count sets the limit for how many transactions should be in the search. This is 100 by default, 1000 max
-     * @param counterpartyID filters the transaction search to only include transactions from specified counterparties
-     * Returns promise of an array of Transaction objects
+     * @param [from] - specifies from what date the transaction search should start from
+     * @param [to] - specifies to what date the transaction search should end
+     * @param [count] - sets limit for how many transactions should be in the search. This is 100 by default, 1000 max
+     * @param [counterpartyID] - filters transaction search to only include transactions from specified counterparties
+     * @return - promise of an array of Transaction objects
+     * @throws error if the client is not authenticated
      */
     public getTransactions(from?: string, to?: string, count?: number,
                            counterpartyID?: string): Promise<Transaction[]> {
@@ -127,7 +140,9 @@ export class Client {
     }
     /**
      * Gets the Transaction with the specified ID
-     * Returns promise of a Transaction object
+     * @param id - the id of the transaction
+     * @return - promise of a Transaction object
+     * @throws error if the client is not authenticated
      */
     public getTransaction(id: string): Promise<Transaction> {
         if (!this.authenicated) {
@@ -137,7 +152,7 @@ export class Client {
     }
     /**
      * Reads token from disk
-     * Returns AccessToken or false depending on if the token was able to be loaded
+     * @return - AccessToken or false depending on if the token was able to be loaded
      */
     private readToken(): AccessToken | false {
         try {
@@ -149,7 +164,8 @@ export class Client {
         }
     }
     /**
-     * Sets the given AccessToken object as the one stored on disk
+     * Sets the param token as the current access token. Writes this to disk and sets it in the class
+     * @param token - the AccessToken object for the api
      */
     private setToken(token: AccessToken): void {
         fs.writeFileSync(this.filename, JSON.stringify(token));
@@ -157,7 +173,7 @@ export class Client {
     }
     /**
      * Refresh the access token asynchronously
-     * Returns a void promise
+     * @return - a void promise. This is so we don't have to deal with what getRefreshToken returns
      */
     private async refreshToken(): Promise<void> {
         return this.getRefreshToken().then(refreshToken => {
@@ -167,7 +183,7 @@ export class Client {
     }
     /**
      * Makes the http call to refresh the access token
-     * Returns a RefreshToken object promise
+     * @return - RefreshToken object as a promise
      */
     private getRefreshToken(): Promise<RefreshToken> {
         return this.http.refreshToken(this.token.refresh_token, this.privateKey);

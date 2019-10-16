@@ -1,3 +1,6 @@
+/**
+ * @file Exports all interfaces used by this module
+ */
 
 /**
  * Basic object definition for get requests' options using the request lib
