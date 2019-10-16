@@ -7,7 +7,7 @@ import {AccessToken, Options} from "./types";
 
 /**
  * Class to wrap all http requests with to make code simpler
- */ // TODO: Add docs for args
+ */
 export class HTTPHelper {
     public readonly SUB_DOMAIN: string;
     public readonly API_SUB_DOMAIN: string;
@@ -18,7 +18,7 @@ export class HTTPHelper {
 
     constructor(clientId: string, dev: boolean) {
         this.CLIENT_ID = clientId;
-        if (dev) { // TODO: Document this behaviour in readme to help Dan with testing
+        if (dev) {
             this.API_SUB_DOMAIN = "sandbox-b2b";
             this.SUB_DOMAIN = "sandbox-business";
         } else {
@@ -39,7 +39,7 @@ export class HTTPHelper {
     /**
      * Makes request to refresh access token
      * returns RequestPromise
-     */ // TODO: Add docs for args
+     */
     public refreshToken(refreshToken: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
         const apiUrl: string = this.API_ROOT + endpoint;
@@ -59,7 +59,7 @@ export class HTTPHelper {
     /**
      * Makes request exchange access code for more permanent access and refresh tokens
      * returns RequestPromise
-     */ // TODO: Add docs for args
+     */
     public exchangeAccessCode(authCode: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
         const apiUrl: string = this.API_ROOT + endpoint;
@@ -79,7 +79,7 @@ export class HTTPHelper {
     /**
      * Makes request to get all accounts for user
      * returns RequestPromise
-     */ // TODO: Add docs for args
+     */
     public getAccounts(token: AccessToken): request.RequestPromise {
         const endpoint: string = "accounts";
         const options = this.createGenericGetOptions(endpoint, token.access_token);
@@ -88,7 +88,7 @@ export class HTTPHelper {
     /**
      * Makes request to get counterparty with specified id
      * returns RequestPromise
-     */ // TODO: Add docs for args
+     */
     public getCounterparty(token: AccessToken, id: string): request.RequestPromise {
         const endpoint: string = `counterparty/${id}`;
         const options = this.createGenericGetOptions(endpoint, token.access_token);
@@ -97,7 +97,7 @@ export class HTTPHelper {
     /**
      * Makes request to get all counterparties for user
      * returns RequestPromise
-     */ // TODO: Add docs for args
+     */
     public getCounterparties(token: AccessToken): request.RequestPromise {
         const endpoint: string = "counterparties";
         const options = this.createGenericGetOptions(endpoint, token.access_token);
@@ -106,7 +106,7 @@ export class HTTPHelper {
     /**
      * Makes request to get transaction with specified id
      * returns RequestPromise
-     */ // TODO: Add docs for args
+     */
     public getTransaction(token: AccessToken, id: string): request.RequestPromise {
         const endpoint: string = `transaction/${id}`;
         const options = this.createGenericGetOptions(endpoint, token.access_token);
@@ -114,8 +114,13 @@ export class HTTPHelper {
     }
     /**
      * Makes request to get all transactions for user
+     * @param token is the access token for the api
+     * @param from specifies from what date the transaction search should start from
+     * @param to specifies to what date the transaction search should end
+     * @param count sets the limit for how many transactions should be in the search. This is 100 by default, 1000 max
+     * @param counterpartyID can filter the transaction search to only include transactions from specified countparties
      * returns RequestPromise
-     */ // TODO: Add docs for args
+     */
     public getTransactions(token: AccessToken, from?: string, to?: string, count?: number,
                            counterpartyID?: string): request.RequestPromise {
         let endpoint: string = "transactions?";
@@ -137,7 +142,7 @@ export class HTTPHelper {
     /**
      * Creates generic options for get requests for most of the revolut api
      * returns Options
-     */ // TODO: Add docs for args
+     */
     private createGenericGetOptions(endpoint: string, accessToken: string): Options {
         return {
             method: "GET",
@@ -149,7 +154,7 @@ export class HTTPHelper {
     /**
      * Creates a json web token (JWT)
      * returns signed jwt
-     */ // TODO: Add docs for args
+     */
     private createSignedJWT(privateKeyName: string): string {
         const privateKey = fs.readFileSync(privateKeyName);
         const issuer = this.localhost; // Issuer for JWT, should be derived from your redirect URL

@@ -4,10 +4,6 @@ import readline = require("readline");
 import {HTTPHelper} from "./http";
 import {AccessToken, Account, Counterparty, RefreshToken, Transaction} from "./types";
 
-
-// TODO: Figuring out we need to reauth
-
-
 /**
  * Handles the terminal input for the access code from the user
  */
@@ -26,6 +22,9 @@ function getAccessCode(): Promise<string> {
 
 /**
  * Client class to wrap all interactions with the api
+ * @param clientId is the client_id as a string
+ * @param boolean for if the program is in dev mode or not
+ * @param privateKey is the path to the ssl private key
  */ // TODO: Add docs for args
 export class Client {
     private readonly filename: string;
@@ -85,7 +84,7 @@ export class Client {
      */
     public getAccounts(): Promise<Account[]> {
         if (!this.authenicated) {
-            throw new Error("Not Authenticated"); // TODO: Fix this code duplication - Standardise errors
+            throw new Error("Not Authenticated");
         }
         return this.http.getAccounts(this.token);
     }
@@ -125,7 +124,7 @@ export class Client {
     /**
      * Gets the Transaction with the specified ID
      * Returns promise of a Transaction object
-     */ // TODO: Add docs for args
+     */
     public getTransaction(id: string): Promise<Transaction> {
         if (!this.authenicated) {
             throw new Error("Not Authenticated");
@@ -147,7 +146,7 @@ export class Client {
     }
     /**
      * Sets the given AccessToken object as the one stored on disk
-     */ // TODO: Add docs for args
+     */
     private setToken(token: AccessToken): void {
         fs.writeFileSync(this.filename, JSON.stringify(token));
         this.token = token;
