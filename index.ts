@@ -32,15 +32,6 @@ const dev = !!program.debug;
 const privateKey = process.env.SSL_PRIVATE_PATH as string;
 const client = new revolut.Client(CLIENT_ID, dev, privateKey);
 
-// General flow
-// Get GBP account
-// Get transactions for account with the params given
-// cycle through all gbp account transactions
-// add them to table array
-// if type 'exchange', go to original account and find original transaction
-// replace info for this transaction for the exchange entry
-// write to csv
-
 /**
  * Reverses a date string from yyyy-mm-dd returned from the api to dd/mm/yyyy
  * @param date - A string representation of a date yyyy-mm-dd
@@ -71,6 +62,21 @@ function getLeg(legs: revolut.Leg[]): revolut.Leg {
 }
 
 /**
+ * Creates a ReadonlyDictionary to represent a row in the csv using a transaction
+ * @param transaction - the transaction for this row in the csv
+ * @param leg - the leg for the transaction that represents the interaction with the GBP account
+ * @return - a row in the csv table
+ */
+function createTableRow(transaction: revolut.Transaction, leg: revolut.Leg): ReadonlyDictionary<string> {
+    return {
+        Date: reverseDateFormat(transaction.completed_at),
+        Description: transaction.reference,
+        Net: leg.amount.toString(),
+        Balance: leg.balance.toString()
+    };
+}
+
+/**
  * Creates an array of dictionaries representing csv transaction data
  * @param acc - The users GBP account with revolut
  * @param transactions - An array of transactions to insert into the csv table
@@ -78,21 +84,26 @@ function getLeg(legs: revolut.Leg[]): revolut.Leg {
  */
 function createTable(acc: revolut.Account, transactions: revolut.Transaction[]): Array<ReadonlyDictionary<string>> {
     const tableRows: Array<ReadonlyDictionary<string>> = [];
+    // reversed as we need to insert transactions oldest first and they are in the array newest first
     for (const transaction of transactions.reverse()) {
         const leg: revolut.Leg = getLeg(transaction.legs);
         // This avoids undefined variable from failed transactions and transactions not in the GBP account
         if (transaction.completed_at && acc.id === leg.account_id) {
-            const row: ReadonlyDictionary<string> = {
-                Date: reverseDateFormat(transaction.completed_at),
-                Description: transaction.reference,
-                Net: leg.amount.toString(),
-                Balance: leg.balance.toString()
-            };
-            tableRows.push(row);
+            tableRows.push(createTableRow(transaction, leg));
         }
     }
     return tableRows;
 }
+
+// General flow
+// #Get GBP account
+// #Get transactions for account with the params given
+// #cycle through all gbp account transactions
+// #add them to table array
+// if type 'exchange', go to original account and find original transaction
+// replace info for this transaction for the exchange entry
+//      throw warning if a transaction during this doesn't match up and cannot be found
+// # write to csv
 
 // Main Flow
 client.authenticate()
