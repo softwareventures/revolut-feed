@@ -184,14 +184,14 @@ function createTable(acc: revolut.Account, transactions: revolut.Transaction[]):
 client.authenticate()
     .then(authed => {
         if (authed) {
-            console.log("successfully authed");
+            console.log("successfully authenticated");
         }
         // This assumes the user has only one GBP account
         return client.getGBPAccount();
     })
     .then(async account => {
         // Write to csv here
-        const transactions = await client.getTransactions("", "", 1000);
+        const transactions = await client.getTransactions(program.from, program.to, 1000);
         const rows = createTable(account, transactions);
         fs.writeFileSync(program.output, csv.write(recordsToTable(rows)));
         console.log("wrote csv to " + program.output);
