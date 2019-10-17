@@ -44,6 +44,27 @@ function reverseDateFormat(date: string): string {
 }
 
 /**
+ * Ensures that a string representation of a currency number has padded decimals to 2 decimal places
+ * @param num - number to pad
+ * @return - If not padded, a padded representation of the number, if no work is needed, then returns the number given
+ */
+function padDecimalStr(num: string): string {
+    const split = num.split(".");
+    let newNum: string;
+    if (split.length === 1) {
+        // There is no decimal and therefore needs to be aded
+        newNum = num + ".00";
+    } else if (split[1].length === 1) {
+        // The number looks like 900.9 instead of 900.90
+        newNum = split.join(".") + "0";
+    } else {
+        // Number is already padded with two decimal places (or more but that won't be an issue)
+        newNum = num;
+    }
+    return newNum;
+}
+
+/**
  * Sorts through an array of legs to get the GBP account leg
  * @param legs - An array of Legs from an revolut transaction object
  * @return - One leg from the transaction
@@ -53,6 +74,8 @@ function getLeg(legs: revolut.Leg[]): revolut.Leg {
     if (legs.length === 1) {
         return legs[0];
     }
+    // If there is more than one leg, it is an exchange transaction
+    // Script expects all exchanges to include the GBP account
     for (const leg of legs) {
         if (leg.currency === "GBP") {
             return leg;
@@ -68,12 +91,49 @@ function getLeg(legs: revolut.Leg[]): revolut.Leg {
  * @return - a row in the csv table
  */
 function createTableRow(transaction: revolut.Transaction, leg: revolut.Leg): ReadonlyDictionary<string> {
+    let description: string;
+    if (transaction.reference) {
+        description = transaction.reference; // Reference is set by our script for foreign exchanges
+    } else {
+        description = leg.description;
+    }
     return {
         Date: reverseDateFormat(transaction.completed_at),
-        Description: transaction.reference,
-        Net: leg.amount.toString(),
-        Balance: leg.balance.toString()
+        Description: description,
+        Net: padDecimalStr(leg.amount.toString()),
+        Balance: padDecimalStr(leg.balance.toString())
     };
+}
+
+/**
+ * Finds matching foreign transaction to exchange transaction from a list of foreign transactions
+ * @param exTrans - Exchange transaction from foreign currency => GBP
+ * @param forTransactions - An array of foreign transactions that have happened before this exchange transaction
+ * @return - exTrans with some modified meta data based on the foreign transaction
+ */
+function findForeignTrans(exTrans: revolut.Transaction,
+                          forTransactions: revolut.Transaction[]): revolut.Transaction | false {
+    // This for loop works because the transactions are listed from oldest to newest
+    for (const forTrans of forTransactions) {
+        for (const leg of exTrans.legs) {
+            // This leg is the foreign currency leg of the exchange and the amount in the transaction is the same
+            // Number is a negative version of the topup transaction, so needs to be made positive
+            const legAmount = leg.amount * -1;
+            if (leg.currency !== "GBP" && legAmount === forTrans.legs[0].amount) {
+                const currency: string = forTrans.legs[0].currency;
+                const amount: string = padDecimalStr(forTrans.legs[0].amount.toString());
+                //
+                exTrans.reference = forTrans.legs[0].description + ` (FX ${currency} ${amount})`;
+                // Remove this transaction out of the list
+                forTransactions.splice(forTransactions.indexOf(forTrans), 1);
+                return exTrans;
+            }
+        }
+    }
+    console.warn(
+        `Could not find equiv of foreign exchange: "${exTrans.legs[0].description}" on ${exTrans.completed_at}`
+    );
+    return false;
 }
 
 /**
@@ -84,12 +144,27 @@ function createTableRow(transaction: revolut.Transaction, leg: revolut.Leg): Rea
  */
 function createTable(acc: revolut.Account, transactions: revolut.Transaction[]): Array<ReadonlyDictionary<string>> {
     const tableRows: Array<ReadonlyDictionary<string>> = [];
+    const foreignTrans: revolut.Transaction[] = [];
     // reversed as we need to insert transactions oldest first and they are in the array newest first
     for (const transaction of transactions.reverse()) {
         const leg: revolut.Leg = getLeg(transaction.legs);
-        // This avoids undefined variable from failed transactions and transactions not in the GBP account
-        if (transaction.completed_at && acc.id === leg.account_id) {
-            tableRows.push(createTableRow(transaction, leg));
+        // Non-GBP transactions will be added to foreignTrans for future search of exchange transactions
+        if (transaction.state === "completed") {
+            if (acc.id !== leg.account_id) {
+                // Transaction is not in the GBP account
+                foreignTrans.push(transaction);
+            } else {
+                if (transaction.type === "exchange") {
+                    // Is an exchange from a foreign currency account
+                    const trans = findForeignTrans(transaction, foreignTrans);
+                    if (trans) {
+                        tableRows.push(createTableRow(trans, leg));
+                    }
+                } else {
+                    // Can just be added to the table, no adjustments required
+                    tableRows.push(createTableRow(transaction, leg));
+                }
+            }
         }
     }
     return tableRows;
