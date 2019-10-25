@@ -5,28 +5,30 @@ Experimental feed of transactions from Revolut
 
 ## Setup
 
-1. clone this repo `git clone git@github.com:softwareventures/revolut-feed.git&&cd revolut-feed`
+1. Clone this repo `git clone git@github.com:softwareventures/revolut-feed.git&&cd revolut-feed`.
 
-1. install dependencies `yarn install`
+1. Install dependencies: `yarn`.
 
-1. compile typescript with `tsc`
+1. Copy example .env file: `cp .env.example .env`.
 
-1. copy example .env file `cp .env.example .env`
-
-1. create ssl keys with the following commands 
+1. Create ssl keys: 
     ```sh
-    openssl genrsa -out privatekey.pem 1024
-    openssl req -new -x509 -key privatekey.pem -out publickey.cer -days 1825
+    openssl genrsa -out privatekey.pem
+    openssl req -new -x509 -days 1825 -key privatekey.pem \
+        -out publickey.cer -subj '/CN=softwareventures.co.uk' 
     ```
 
-1. go to `https://business.revolut.com/settings/api` and setup the api app. Copy the contents of the file `publickey.cer` for the `X509 public key` field and enter `http://127.0.0.1` as the redirect uri
+1. In `.env`, fill in `SSL_PRIVATE_PATH` with the path to `privatekey.pem`.
 
-1. on the next page, copy the client_id and paste it in the .env file
-    > For some reason this only is possible via inspect element-ing the page to copy the html
+1. Go to `https://business.revolut.com/settings/api` and setup the api app. Copy the contents of the file `publickey.cer` for the `X509 public key` field and enter `http://127.0.0.1` as the redirect URL.
 
-1. click on the `Enable API access to your account` button and give access to our app. This will redirect you localhost. Copy the access code in the url. It will be in the url param called `code`
+1. On the next page, copy the client_id and paste it in the .env file.
 
-1. run the program with `node index.js` and paste the code into the terminal
+1. If working in production, add your IP or IP range to the Production IP whitelist.
+
+1. Click on the `Enable API access to your account` button and give access to our app. This will redirect you localhost. Copy the access code in the url. It will be in the url param called `code`.
+
+1. Run the program with `yarn start` and paste the code into the terminal
 
 Now the app is authenticated and will run!
 
