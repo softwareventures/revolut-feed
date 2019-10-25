@@ -16,9 +16,9 @@
   "bugs": "https://github.com/softwareventures/revolut-feed",
   "repository": "github:softwareventures/revolut-feed",
   "scripts": {
-    "prepare": "tsc",
     "semantic-release": "semantic-release",
-    "test": "tslint --project . && ava"
+    "test": "tsc && tslint --project . && ava",
+    "start": "ts-node ."
   },
   "dependencies": {
     "@softwareventures/csv": "^0.1.16",
