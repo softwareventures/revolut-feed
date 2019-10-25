@@ -3,9 +3,9 @@
  * @file Handles all http requests away from users
  */
 
-import fs = require("fs");
-import jwt = require("jsonwebtoken");
-import request = require("request-promise-native");
+import {readFileSync} from "fs";
+import * as jwt from "jsonwebtoken";
+import * as request from "request-promise-native";
 import {AccessToken, Options} from "./types";
 
 
@@ -169,7 +169,7 @@ export class HTTPHelper {
      * @return - signed jwt
      */
     private createSignedJWT(privateKeyName: string): string {
-        const privateKey = fs.readFileSync(privateKeyName);
+        const privateKey = readFileSync(privateKeyName);
         const issuer = this.localhost; // Issuer for JWT, should be derived from your redirect URL
         const revolutUrl = "https://revolut.com"; // Constant
         const payload = {

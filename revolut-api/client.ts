@@ -3,8 +3,8 @@
  * @file Handles the client that users interact with the api with
  */
 
-import fs = require("fs");
-import readline = require("readline");
+import {readFileSync, writeFileSync} from "fs";
+import * as readline from "readline";
 import {HTTPHelper} from "./http";
 import {AccessToken, Account, Counterparty, RefreshToken, Transaction} from "./types";
 
@@ -156,7 +156,7 @@ export class Client {
      */
     private readToken(): AccessToken | false {
         try {
-            const rawData = fs.readFileSync(this.filename, "utf-8");
+            const rawData = readFileSync(this.filename, "utf-8");
             const data = JSON.parse(rawData);
             return data as AccessToken;
         } catch (err) {
@@ -168,7 +168,7 @@ export class Client {
      * @param token - the AccessToken object for the api
      */
     private setToken(token: AccessToken): void {
-        fs.writeFileSync(this.filename, JSON.stringify(token));
+        writeFileSync(this.filename, JSON.stringify(token));
         this.token = token;
     }
     /**
