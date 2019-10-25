@@ -3,9 +3,9 @@ import {recordsToTable} from "@softwareventures/table";
 import program = require("commander");
 import {ReadonlyDictionary} from "dictionary-types";
 import * as dotenv from "dotenv";
-import fs = require("fs");
+import {writeFileSync} from "fs";
 import {version} from "./package.json";
-import revolut = require("./revolut-api");
+import {Account, Client, Leg, Transaction} from "./revolut-api";
 
 
 // Parse command line args
@@ -30,7 +30,7 @@ if (!CLIENT_ID) {
 }
 const dev = !!program.debug;
 const privateKey = process.env.SSL_PRIVATE_PATH as string;
-const client = new revolut.Client(CLIENT_ID, dev, privateKey);
+const client = new Client(CLIENT_ID, dev, privateKey);
 
 /**
  * Reverses a date string from yyyy-mm-dd returned from the api to dd/mm/yyyy
@@ -49,7 +49,7 @@ function reverseDateFormat(date: string): string {
  * @return - One leg from the transaction
  * @throws an error if there is no GBP account with the user
  */
-function getLeg(legs: revolut.Leg[]): revolut.Leg {
+function getLeg(legs: Leg[]): Leg {
     if (legs.length === 1) {
         return legs[0];
     }
@@ -69,7 +69,7 @@ function getLeg(legs: revolut.Leg[]): revolut.Leg {
  * @param leg - the leg for the transaction that represents the interaction with the GBP account
  * @return - a row in the csv table
  */
-function createTableRow(transaction: revolut.Transaction, leg: revolut.Leg): ReadonlyDictionary<string> {
+function createTableRow(transaction: Transaction, leg: Leg): ReadonlyDictionary<string> {
     let description: string;
     if (transaction.reference) {
         description = transaction.reference; // Reference is set by our script for foreign exchanges
@@ -90,8 +90,8 @@ function createTableRow(transaction: revolut.Transaction, leg: revolut.Leg): Rea
  * @param forTransactions - An array of foreign transactions that have happened before this exchange transaction
  * @return - exTrans with some modified meta data based on the foreign transaction
  */
-function findForeignTrans(exTrans: revolut.Transaction,
-                          forTransactions: revolut.Transaction[]): revolut.Transaction | false {
+function findForeignTrans(exTrans: Transaction,
+                          forTransactions: Transaction[]): Transaction | false {
     // This for loop works because the transactions are listed from oldest to newest
     for (const forTrans of forTransactions) {
         for (const leg of exTrans.legs) {
@@ -121,12 +121,12 @@ function findForeignTrans(exTrans: revolut.Transaction,
  * @param transactions - An array of transactions to insert into the csv table
  * @return An array of dictionaries with string keys
  */
-function createTable(acc: revolut.Account, transactions: revolut.Transaction[]): Array<ReadonlyDictionary<string>> {
+function createTable(acc: Account, transactions: Transaction[]): Array<ReadonlyDictionary<string>> {
     const tableRows: Array<ReadonlyDictionary<string>> = [];
-    const foreignTrans: revolut.Transaction[] = [];
+    const foreignTrans: Transaction[] = [];
     // reversed as we need to insert transactions oldest first and they are in the array newest first
     for (const transaction of transactions.reverse()) {
-        const leg: revolut.Leg = getLeg(transaction.legs);
+        const leg: Leg = getLeg(transaction.legs);
         // Non-GBP transactions will be added to foreignTrans for future search of exchange transactions
         if (transaction.state === "completed") {
             if (acc.id !== leg.account_id) {
@@ -172,7 +172,7 @@ client.authenticate()
         // Write to csv here
         const transactions = await client.getTransactions(program.from, program.to, 1000);
         const rows = createTable(account, transactions);
-        fs.writeFileSync(program.output, csv.write(recordsToTable(rows)));
+        writeFileSync(program.output, csv.write(recordsToTable(rows)));
         console.log("wrote csv to " + program.output);
         process.exit(0);
     })
