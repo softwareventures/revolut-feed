@@ -1,5 +1,8 @@
 {
   "extends": "@softwareventures/tsconfig",
+  "compilerOptions": {
+    "noEmit": true
+  },
   "exclude": [
     "**/*.test.ts",
     "**/test.ts"
