@@ -1,10 +1,10 @@
-
 import * as csv from "@softwareventures/csv";
 import {recordsToTable} from "@softwareventures/table";
 import program = require("commander");
 import {ReadonlyDictionary} from "dictionary-types";
 import * as dotenv from "dotenv";
 import fs = require("fs");
+import {version} from "./package.json";
 import revolut = require("./revolut-api");
 
 
@@ -12,7 +12,7 @@ import revolut = require("./revolut-api");
 program
     .name("revolut-feed")
     .description("Experimental feed of transactions from Revolut")
-    .version("0.0.0-development", "-v, --version", "output the current version") // Maybe read this from package.json
+    .version(version, "-v, --version", "output the current version")
     .option("-d, --debug", "connects and uses the sandbox environment")
     .option("-o, --output <name>", "/path/to/output csv filename", "revolut-feed.csv")
     .option("-f, --from <date>", "date for beginning of transaction search [Format yyyy/mm/dd]")
@@ -41,27 +41,6 @@ function reverseDateFormat(date: string): string {
     const oldDate: string = date.split("T")[0];
     const dateArray = oldDate.split("-");
     return dateArray.reverse().join("/");
-}
-
-/**
- * Ensures that a string representation of a currency number has padded decimals to 2 decimal places
- * @param num - number to pad
- * @return - If not padded, a padded representation of the number, if no work is needed, then returns the number given
- */
-function padDecimalStr(num: string): string {
-    const split = num.split(".");
-    let newNum: string;
-    if (split.length === 1) {
-        // There is no decimal and therefore needs to be aded
-        newNum = num + ".00";
-    } else if (split[1].length === 1) {
-        // The number looks like 900.9 instead of 900.90
-        newNum = split.join(".") + "0";
-    } else {
-        // Number is already padded with two decimal places (or more but that won't be an issue)
-        newNum = num;
-    }
-    return newNum;
 }
 
 /**
@@ -100,8 +79,8 @@ function createTableRow(transaction: revolut.Transaction, leg: revolut.Leg): Rea
     return {
         Date: reverseDateFormat(transaction.completed_at),
         Description: description,
-        Net: padDecimalStr(leg.amount.toString()),
-        Balance: padDecimalStr(leg.balance.toString())
+        Net: leg.amount.toFixed(2),
+        Balance: leg.balance.toFixed(2)
     };
 }
 
@@ -121,7 +100,7 @@ function findForeignTrans(exTrans: revolut.Transaction,
             const legAmount = leg.amount * -1;
             if (leg.currency !== "GBP" && legAmount === forTrans.legs[0].amount) {
                 const currency: string = forTrans.legs[0].currency;
-                const amount: string = padDecimalStr(forTrans.legs[0].amount.toString());
+                const amount: string = forTrans.legs[0].amount.toFixed(2);
                 //
                 exTrans.reference = forTrans.legs[0].description + ` (FX ${currency} ${amount})`;
                 // Remove this transaction out of the list
