@@ -49,11 +49,11 @@ This flag specifies the path to the output csv. This can be used to customise th
 
 ### -f, --from <date>
 
-A date with the format `yyyy/mm/dd` to filter transactions starting from this date.
+A date with the format `yyyy-mm-dd` to filter transactions starting from this date.
 
 ### -t, --to <date>
 
-A date with the format `yyyy/mm/dd` to filter transactions to this date. This defaults to `now` which will be today's date.
+A date with the format `yyyy-mm-dd` to filter transactions to this date. This defaults to `now` which will be today's date.
 
 
 ## Known Issues

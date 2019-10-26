@@ -16,8 +16,8 @@ program
     .version(version, "-v, --version", "output the current version")
     .option("-d, --debug", "connects and uses the sandbox environment")
     .option("-o, --output <name>", "/path/to/output csv filename", "revolut-feed.csv")
-    .option("-f, --from <date>", "date for beginning of transaction search [Format yyyy/mm/dd]")
-    .option("-t, --to <date>", "date for the end of the transaction search [Format yyyy/mm/dd] (default: 'now' [today's date])");
+    .option("-f, --from <date>", "date for beginning of transaction search [Format yyyy-mm-dd]")
+    .option("-t, --to <date>", "date for the end of the transaction search [Format yyyy-mm-dd] (default: 'now' [today's date])");
 
 program.parse(process.argv);
 
