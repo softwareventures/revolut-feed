@@ -71,11 +71,9 @@ function getLeg(legs: ReadonlyArray<Leg>): Leg {
  * @return - a row in the csv table
  */
 function createTableRow(transaction: Transaction, leg: Leg): ReadonlyDictionary<string> {
-    let description: string;
+    let description = leg.description;
     if (transaction.reference) {
-        description = transaction.reference; // Reference is set by our script for foreign exchanges
-    } else {
-        description = leg.description;
+        description += ` - ${transaction.reference}`;
     }
     return {
         Date: reverseDateFormat(transaction.completed_at),
@@ -115,7 +113,13 @@ function matchForeignTransaction(exchangeTransaction: Transaction, foreignTransa
                 return {
                     updatedTransaction: {
                         ...exchangeTransaction,
-                        reference: foreignTransaction.legs[0].description + ` (FX ${currency} ${amount})`
+                        reference: foreignTransaction.reference,
+                        legs: [
+                            {
+                                ...foreignTransaction.legs[0],
+                                description: foreignTransaction.legs[0].description + ` (FX ${currency} ${amount})`
+                            }
+                        ]
                     },
                     otherForeignTransactions: filter(foreignTransactions, t => t !== foreignTransaction)
                 };
