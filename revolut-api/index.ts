@@ -1,4 +1,2 @@
-import {Client} from "./client";
-import {AccessToken, Account, Leg, RefreshToken, Transaction} from "./types";
-
-export {Account, AccessToken, Leg, RefreshToken, Transaction, Client};
+export {Client} from "./client";
+export {Account, Leg, Transaction} from "./types";
