@@ -135,17 +135,18 @@ export class HTTPHelper {
                            counterpartyID?: string): request.RequestPromise {
         let endpoint: string = "transactions?";
         if (from) {
-            endpoint += "from=" + from;
+            endpoint += "from=" + from + "&";
         }
         if (to) {
-            endpoint += "to=" + to;
+            endpoint += "to=" + to + "&";
         }
         if (count as number >= 1) {  // If count is more than 0
-            endpoint += "count=" + count;
+            endpoint += "count=" + count + "&";
         }
         if (counterpartyID) {
-            endpoint += "counterparty=" + counterpartyID;
+            endpoint += "counterparty=" + counterpartyID + "&";
         }
+        endpoint = endpoint.substr(0, endpoint.length - 1);
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }
