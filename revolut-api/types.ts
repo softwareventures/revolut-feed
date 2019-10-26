@@ -22,14 +22,14 @@ export interface AccessToken {
     refresh_token: string;
 }
 
-/**
- * Object representing the JSON data received when refreshing the current access token
- */
-export interface RefreshToken {
-    access_token: string;
-    token_type: string;
-    expires_in: number;
-}
+// /**
+//  * Object representing the JSON data received when refreshing the current access token
+//  */
+// export interface RefreshToken {
+//     access_token: string;
+//     token_type: string;
+//     expires_in: number;
+// }
 
 /**
  * Object representing a revolut account

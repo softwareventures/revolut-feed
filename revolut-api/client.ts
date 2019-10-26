@@ -6,7 +6,7 @@
 import {readFileSync, writeFileSync} from "fs";
 import * as readline from "readline";
 import {HTTPHelper} from "./http";
-import {AccessToken, Account, Counterparty, RefreshToken, Transaction} from "./types";
+import {AccessToken, Account, Counterparty, Transaction} from "./types";
 
 /**
  * Handles the terminal input for the access code from the user
@@ -64,7 +64,7 @@ export class Client {
             this.authenicated = true;
             return true;
         } else {
-            await this.refreshToken();
+            // await this.refreshToken();
             this.authenicated = true;
             return true;
         }
@@ -171,21 +171,21 @@ export class Client {
         writeFileSync(this.filename, JSON.stringify(token));
         this.token = token;
     }
-    /**
-     * Refresh the access token asynchronously
-     * @return - a void promise. This is so we don't have to deal with what getRefreshToken returns
-     */
-    private async refreshToken(): Promise<void> {
-        return this.getRefreshToken().then(refreshToken => {
-            this.token.access_token = refreshToken.access_token;
-            this.setToken(this.token);
-        });
-    }
-    /**
-     * Makes the http call to refresh the access token
-     * @return - RefreshToken object as a promise
-     */
-    private getRefreshToken(): Promise<RefreshToken> {
-        return this.http.refreshToken(this.token.refresh_token, this.privateKey);
-    }
+    // /**
+    //  * Refresh the access token asynchronously
+    //  * @return - a void promise. This is so we don't have to deal with what getRefreshToken returns
+    //  */
+    // private async refreshToken(): Promise<void> {
+    //     return this.getRefreshToken().then(refreshToken => {
+    //         this.token.access_token = refreshToken.access_token;
+    //         this.setToken(this.token);
+    //     });
+    // }
+    // /**
+    //  * Makes the http call to refresh the access token
+    //  * @return - RefreshToken object as a promise
+    //  */
+    // private getRefreshToken(): Promise<RefreshToken> {
+    //     return this.http.refreshToken(this.token.refresh_token, this.privateKey);
+    // }
 }
