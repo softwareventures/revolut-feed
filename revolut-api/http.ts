@@ -10,7 +10,7 @@ import {AccessToken, Options} from "./types";
 
 /** Class to wrap all http requests with to make code simpler */
 export class HTTPHelper {
-    public readonly apiRoot: string;
+    private readonly apiRoot: string;
     private readonly localhost: string;
     private readonly clientId: string;
     private readonly clientAssertionType: string;
