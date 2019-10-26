@@ -146,7 +146,7 @@ export class Client {
     }
     /**
      * Reads token from disk
-     * @return - AccessToken or false depending on if the token was able to be loaded
+     * @return - AccessToken or null depending on if the token was able to be loaded
      */
     private readToken(): AccessToken | null {
         try {
