@@ -6,109 +6,109 @@
  * Basic object definition for get requests' options using the request lib
  */
 export interface Options {
-    headers: { Authorization: string };
-    method: "GET";
-    json: true;
-    url: string;
+    readonly headers: { readonly Authorization: string };
+    readonly method: "GET";
+    readonly json: true;
+    readonly url: string;
 }
 
 /**
  * Object representing the JSON data received when getting an access token via access code
  */
 export interface AccessToken {
-    access_token: string;
-    token_type: string;
-    expires_in: number;
-    refresh_token: string;
+    readonly access_token: string;
+    readonly token_type: string;
+    readonly expires_in: number;
+    readonly refresh_token: string;
 }
 
 // /**
 //  * Object representing the JSON data received when refreshing the current access token
 //  */
 // export interface RefreshToken {
-//     access_token: string;
-//     token_type: string;
-//     expires_in: number;
+//     readonly access_token: string;
+//     readonly token_type: string;
+//     readonly expires_in: number;
 // }
 
 /**
  * Object representing a revolut account
  */
 export interface Account {
-    id: string;
-    name: string;
-    balance: number;
-    currency: string;
-    state: string;
-    public: boolean;
-    updated_at: string;
-    created_at: string;
+    readonly id: string;
+    readonly name: string;
+    readonly balance: number;
+    readonly currency: string;
+    readonly state: string;
+    readonly public: boolean;
+    readonly updated_at: string;
+    readonly created_at: string;
 }
 
 /**
  * Object of counterparties account data from the api
  */
 export interface CounterpartyAccount {
-    id: string;
-    currency: string;
-    type: string;
-    account_no: string;
-    sort_code: string;
-    email: string;
-    name: string;
-    bank_country: string;
-    recipient_charges: string;
+    readonly id: string;
+    readonly currency: string;
+    readonly type: string;
+    readonly account_no: string;
+    readonly sort_code: string;
+    readonly email: string;
+    readonly name: string;
+    readonly bank_country: string;
+    readonly recipient_charges: string;
 }
 
 /**
  * Object representing counterparties
  */
 export interface Counterparty {
-    id: string;
-    name: string;
-    phone: string;
-    profile_type: string;
-    country: string;
-    state: string;
-    created_at: string;
-    updated_at: string;
-    accounts: CounterpartyAccount[];
+    readonly id: string;
+    readonly name: string;
+    readonly phone: string;
+    readonly profile_type: string;
+    readonly country: string;
+    readonly state: string;
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly accounts: ReadonlyArray<CounterpartyAccount>;
 }
 
 /**
  * Object representing a counterparty from a transaction
  */
 export interface TransactionCounterparty {
-    id: string;
-    type: string;
-    account_id: string;
+    readonly id: string;
+    readonly type: string;
+    readonly account_id: string;
 }
 
 /**
  * Object representing a leg from a transaction
  */
 export interface Leg {
-    leg_id: string;
-    account_id: string;
-    counterparty: TransactionCounterparty;
-    amount: number;
-    currency: string;
-    description: string;
-    balance: number;
+    readonly leg_id: string;
+    readonly account_id: string;
+    readonly counterparty: TransactionCounterparty;
+    readonly amount: number;
+    readonly currency: string;
+    readonly description: string;
+    readonly balance: number;
 }
 
 /**
  * Object representing a transaction
  */
 export interface Transaction {
-    id: string;
-    type: string;
-    request_id: string;
-    state: string;
-    created_at: string;
-    updated_at: string;
-    completed_at: string;
-    reference: string;
-    legs: Leg[];
-    scheduled_for: string;
+    readonly id: string;
+    readonly type: string;
+    readonly request_id: string;
+    readonly state: string;
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly completed_at: string;
+    readonly reference: string;
+    readonly legs: ReadonlyArray<Leg>;
+    readonly scheduled_for: string;
 }

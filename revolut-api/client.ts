@@ -29,9 +29,9 @@ function getAccessCode(): Promise<string> {
 /** Client class to wrap all interactions with the api for the user */
 export class Client {
     private readonly filename: string;
-    private http: HTTPHelper;
+    private readonly http: HTTPHelper;
     private authenticated: boolean;
-    private token: AccessToken | null;
+    private readonly token: AccessToken | null;
 
     /**
      * Create a client
