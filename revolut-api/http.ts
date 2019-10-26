@@ -11,11 +11,11 @@ import {AccessToken, Options} from "./types";
 
 /** Class to wrap all http requests with to make code simpler */
 export class HTTPHelper {
-    public readonly SUB_DOMAIN: string;
-    public readonly API_SUB_DOMAIN: string;
-    public readonly API_ROOT: string;
+    public readonly subDomain: string;
+    public readonly apiSubDomain: string;
+    public readonly apiRoot: string;
     private readonly localhost: string;
-    private readonly CLIENT_ID: string;
+    private readonly clientId: string;
     private readonly clientAssertionType: string;
 
     /**
@@ -24,15 +24,15 @@ export class HTTPHelper {
      * @param dev - true or false for if the client is in development mode
      */
     constructor(clientId: string, dev: boolean) {
-        this.CLIENT_ID = clientId;
+        this.clientId = clientId;
         if (dev) {
-            this.API_SUB_DOMAIN = "sandbox-b2b";
-            this.SUB_DOMAIN = "sandbox-business";
+            this.apiSubDomain = "sandbox-b2b";
+            this.subDomain = "sandbox-business";
         } else {
-            this.API_SUB_DOMAIN = "b2b";
-            this.SUB_DOMAIN = "business";
+            this.apiSubDomain = "b2b";
+            this.subDomain = "business";
         }
-        this.API_ROOT = `https://${this.API_SUB_DOMAIN}.revolut.com/api/1.0/`;
+        this.apiRoot = `https://${this.apiSubDomain}.revolut.com/api/1.0/`;
         this.clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
         this.localhost = "127.0.0.1";
     }
@@ -44,13 +44,13 @@ export class HTTPHelper {
      */
     public refreshToken(refreshToken: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
-        const apiUrl: string = this.API_ROOT + endpoint;
+        const apiUrl: string = this.apiRoot + endpoint;
         const options = { method: "POST",
             url: apiUrl,
             form: {
                 grant_type: "refresh_token",
                 refresh_token: refreshToken,
-                client_id: this.CLIENT_ID,
+                client_id: this.clientId,
                 client_assertion_type: this.clientAssertionType,
                 client_assertion: this.createSignedJWT(privateKey)
             },
@@ -66,13 +66,13 @@ export class HTTPHelper {
      */
     public exchangeAccessCode(authCode: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
-        const apiUrl: string = this.API_ROOT + endpoint;
+        const apiUrl: string = this.apiRoot + endpoint;
         const options = { method: "POST",
             url: apiUrl,
             form: {
                 grant_type: "authorization_code",
                 code: authCode,
-                client_id: this.CLIENT_ID,
+                client_id: this.clientId,
                 client_assertion_type: this.clientAssertionType,
                 client_assertion: this.createSignedJWT(privateKey)
             },
@@ -159,7 +159,7 @@ export class HTTPHelper {
     private createGenericGetOptions(endpoint: string, accessToken: string): Options {
         return {
             method: "GET",
-            url: this.API_ROOT + endpoint,
+            url: this.apiRoot + endpoint,
             headers: {Authorization: `Bearer ${accessToken}`},
             json: true
         };
@@ -175,7 +175,7 @@ export class HTTPHelper {
         const revolutUrl = "https://revolut.com"; // Constant
         const payload = {
             iss: issuer,
-            sub: this.CLIENT_ID,
+            sub: this.clientId,
             aud: revolutUrl
         };
         return jwt.sign(payload, privateKey, { algorithm: "RS256", expiresIn: 60 * 60});
