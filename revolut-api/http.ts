@@ -1,4 +1,3 @@
-
 /**
  * @file Handles all http requests away from users
  */
@@ -11,7 +10,6 @@ import {AccessToken, Options} from "./types";
 
 /** Class to wrap all http requests with to make code simpler */
 export class HTTPHelper {
-    public readonly apiSubDomain: string;
     public readonly apiRoot: string;
     private readonly localhost: string;
     private readonly clientId: string;
@@ -24,15 +22,14 @@ export class HTTPHelper {
      */
     constructor(clientId: string, dev: boolean) {
         this.clientId = clientId;
-        if (dev) {
-            this.apiSubDomain = "sandbox-b2b";
-        } else {
-            this.apiSubDomain = "b2b";
-        }
-        this.apiRoot = `https://${this.apiSubDomain}.revolut.com/api/1.0/`;
+        const apiSubDomain = dev
+            ? "sandbox-b2b"
+            : "b2b";
+        this.apiRoot = `https://${apiSubDomain}.revolut.com/api/1.0/`;
         this.clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
         this.localhost = "127.0.0.1";
     }
+
     /**
      * Makes request to refresh access token
      * @param refreshToken - the refresh token that is part of the AccessToken object
@@ -42,7 +39,8 @@ export class HTTPHelper {
     public refreshToken(refreshToken: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
         const apiUrl: string = this.apiRoot + endpoint;
-        const options = { method: "POST",
+        const options = {
+            method: "POST",
             url: apiUrl,
             form: {
                 grant_type: "refresh_token",
@@ -55,6 +53,7 @@ export class HTTPHelper {
         };
         return request(options);
     }
+
     /**
      * Makes request exchange access code for more permanent access and refresh tokens
      * @param authCode - the auth code given after the user has given permission to the application
@@ -64,7 +63,8 @@ export class HTTPHelper {
     public exchangeAccessCode(authCode: string, privateKey: string): request.RequestPromise {
         const endpoint: string = "auth/token";
         const apiUrl: string = this.apiRoot + endpoint;
-        const options = { method: "POST",
+        const options = {
+            method: "POST",
             url: apiUrl,
             form: {
                 grant_type: "authorization_code",
@@ -77,6 +77,7 @@ export class HTTPHelper {
         };
         return request(options);
     }
+
     /**
      * Makes request to get all accounts for user
      * @param token - the AccessToken object for the api
@@ -87,6 +88,7 @@ export class HTTPHelper {
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }
+
     /**
      * Makes request to get counterparty with specified id
      * @param token - the AccessToken object for the api
@@ -98,6 +100,7 @@ export class HTTPHelper {
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }
+
     /**
      * Makes request to get all counterparties for user
      * @param token - the AccessToken object for the api
@@ -108,6 +111,7 @@ export class HTTPHelper {
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }
+
     /**
      * Makes request to get transaction with specified id
      * @param token - the AccessToken object for the api
@@ -119,6 +123,7 @@ export class HTTPHelper {
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }
+
     /**
      * Makes request to get all transactions for user
      * @param token - the AccessToken object for the api
@@ -147,6 +152,7 @@ export class HTTPHelper {
         const options = this.createGenericGetOptions(endpoint, token.access_token);
         return request(options);
     }
+
     /**
      * Creates generic options for get requests for most of the revolut api
      * @param endpoint - The endpoint for the api resource sans api root
@@ -161,6 +167,7 @@ export class HTTPHelper {
             json: true
         };
     }
+
     /**
      * Creates a json web token (JWT)
      * @param privateKeyName - the path to private ssl key
@@ -175,6 +182,6 @@ export class HTTPHelper {
             sub: this.clientId,
             aud: revolutUrl
         };
-        return jwt.sign(payload, privateKey, { algorithm: "RS256", expiresIn: 60 * 60});
+        return jwt.sign(payload, privateKey, {algorithm: "RS256", expiresIn: 60 * 60});
     }
 }
