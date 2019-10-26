@@ -30,7 +30,7 @@ function getAccessCode(): Promise<string> {
 export class Client {
     private readonly filename: string;
     private http: HTTPHelper;
-    private authenicated: boolean;
+    private authenticated: boolean;
     private token: AccessToken;
 
     /**
@@ -41,7 +41,7 @@ export class Client {
      */
     constructor(private readonly clientId: string, private readonly dev: boolean, private readonly privateKey: string) {
         this.http = new HTTPHelper(this.clientId, this.dev);
-        this.authenicated = false;
+        this.authenticated = false;
         this.filename = "./access_token.json";
         this.token = this.readToken() as AccessToken;
     }
@@ -55,11 +55,11 @@ export class Client {
             const authCode = await getAccessCode();
             const response = await this.http.exchangeAccessCode(authCode, this.privateKey);
             this.setToken(response);
-            this.authenicated = true;
+            this.authenticated = true;
             return true;
         } else {
             // await this.refreshToken();
-            this.authenicated = true;
+            this.authenticated = true;
             return true;
         }
     }
@@ -86,7 +86,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getAccounts(): Promise<Account[]> {
-        if (!this.authenicated) {
+        if (!this.authenticated) {
             throw new Error("Not Authenticated");
         }
         return this.http.getAccounts(this.token);
@@ -97,7 +97,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getCounterparties(): Promise<Counterparty[]> {
-        if (!this.authenicated) {
+        if (!this.authenticated) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparties(this.token);
@@ -109,7 +109,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getCounterparty(id: string): Promise<Counterparty> {
-        if (!this.authenicated) {
+        if (!this.authenticated) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparty(this.token, id);
@@ -126,7 +126,7 @@ export class Client {
      */
     public getTransactions(from?: string, to?: string, count?: number,
                            counterpartyID?: string): Promise<Transaction[]> {
-        if (!this.authenicated) {
+        if (!this.authenticated) {
             throw new Error("Not Authenticated");
         }
         // Limit of the api for count is 1000, going to struggle if we need to get more than this
@@ -139,7 +139,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getTransaction(id: string): Promise<Transaction> {
-        if (!this.authenicated) {
+        if (!this.authenticated) {
             throw new Error("Not Authenticated");
         }
         return this.http.getTransaction(this.token, id);
