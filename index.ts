@@ -102,11 +102,11 @@ function matchForeignTransaction(exchangeTransaction: Transaction, foreignTransa
 } | null {
     // This for loop works because the transactions are listed from oldest to newest
     for (const foreignTransaction of foreignTransactions) {
-        for (const leg of exchangeTransaction.legs) {
+        for (const foreignLeg of exchangeTransaction.legs) {
             // This leg is the foreign currency leg of the exchange and the amount in the transaction is the same
             // Number is a negative version of the topup transaction, so needs to be made positive
-            const legAmount = leg.amount * -1;
-            if (leg.currency !== "GBP" && legAmount === foreignTransaction.legs[0].amount) {
+            const legAmount = foreignLeg.amount * -1;
+            if (foreignLeg.currency !== "GBP" && legAmount === foreignTransaction.legs[0].amount) {
                 const currency: string = foreignTransaction.legs[0].currency;
                 const amount: string = foreignTransaction.legs[0].amount.toFixed(2);
 
@@ -116,7 +116,7 @@ function matchForeignTransaction(exchangeTransaction: Transaction, foreignTransa
                         reference: foreignTransaction.reference,
                         legs: [
                             {
-                                ...foreignTransaction.legs[0],
+                                ...getLeg(exchangeTransaction.legs),
                                 description: foreignTransaction.legs[0].description + ` (FX ${currency} ${amount})`
                             }
                         ]
@@ -156,7 +156,7 @@ function createTable(acc: Account, transactions: ReadonlyArray<Transaction>): Ar
                     // Is an exchange from a foreign currency account
                     const match = matchForeignTransaction(transaction, foreignTrans);
                     if (match) {
-                        tableRows.push(createTableRow(match.updatedTransaction, leg));
+                        tableRows.push(createTableRow(match.updatedTransaction, match.updatedTransaction.legs[0]));
                         foreignTrans = match.otherForeignTransactions;
                     }
                 } else {
