@@ -122,7 +122,10 @@ function matchForeignTransaction(exchangeTransaction: Transaction, foreignTransa
             }
         }
     }
-    console.warn(`Could not find equiv of foreign exchange: "${exchangeTransaction.legs[0].description}" `
+    console.warn("Could not find matching foreign transaction for exchange: "
+        + `"${exchangeTransaction.legs[0].description}" `
+        + `${exchangeTransaction.legs[0].currency} ${(-exchangeTransaction.legs[0].amount).toFixed(2)} `
+        + `to ${exchangeTransaction.legs[1].currency} ${exchangeTransaction.legs[1].amount.toFixed(2)} `
         + `on ${exchangeTransaction.completed_at}`);
     return null;
 }
