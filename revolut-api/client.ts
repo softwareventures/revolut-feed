@@ -29,9 +29,6 @@ function getAccessCode(): Promise<string> {
 /** Client class to wrap all interactions with the api for the user */
 export class Client {
     private readonly filename: string;
-    private readonly clientId: string;
-    private readonly dev: boolean;
-    private readonly privateKey: string;
     private http: HTTPHelper;
     private authenicated: boolean;
     private token: AccessToken;
@@ -42,10 +39,7 @@ export class Client {
      * @param dev - true if the program is being run in development mode
      * @param privateKey - path to the sll private key
      */
-    constructor(clientId: string, dev: boolean, privateKey: string) {
-        this.clientId = clientId;
-        this.dev = dev;
-        this.privateKey = privateKey;
+    constructor(private readonly clientId: string, private readonly dev: boolean, private readonly privateKey: string) {
         this.http = new HTTPHelper(this.clientId, this.dev);
         this.authenicated = false;
         this.filename = "./access_token.json";
