@@ -105,7 +105,7 @@ function matchForeignTransaction(exchangeTransaction: Transaction, foreignTransa
         for (const foreignLeg of exchangeTransaction.legs) {
             // This leg is the foreign currency leg of the exchange and the amount in the transaction is the same
             // Number is a negative version of the topup transaction, so needs to be made positive
-            const legAmount = foreignLeg.amount * -1;
+            const legAmount = -foreignLeg.amount;
             if (foreignLeg.currency !== "GBP" && legAmount === foreignTransaction.legs[0].amount) {
                 const currency: string = foreignTransaction.legs[0].currency;
                 const amount: string = foreignTransaction.legs[0].amount.toFixed(2);
