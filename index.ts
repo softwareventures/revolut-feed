@@ -5,6 +5,7 @@ import program = require("commander");
 import {ReadonlyDictionary} from "dictionary-types";
 import * as dotenv from "dotenv";
 import {writeFileSync} from "fs";
+import {readAccessToken, writeAccessToken} from "./access-token";
 import {version} from "./package.json";
 import {Account, Client, Leg, Transaction} from "./revolut-api";
 
@@ -186,13 +187,16 @@ function createTable(acc: Account, transactions: ReadonlyArray<Transaction>): Ar
 // # write to csv
 
 // Main Flow
-client.authenticate()
-    .then(authed => {
-        if (authed) {
-            console.log("successfully authenticated");
+readAccessToken("access_token.json")
+    .then(accessToken => client.authenticate(accessToken))
+    .then(accessToken => {
+        if (accessToken == null) {
+            throw new Error("Authentication failed");
+        } else {
+            console.log("Successfully authenticated");
+            return writeAccessToken("access_token.json", accessToken)
+                .then(() => client.getGBPAccount());
         }
-        // This assumes the user has only one GBP account
-        return client.getGBPAccount();
     })
     .then(async account => {
         // Write to csv here

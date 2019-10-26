@@ -3,7 +3,6 @@
  * @file Handles the client that users interact with the api with
  */
 
-import {readFileSync, writeFileSync} from "fs";
 import * as readline from "readline";
 import {HTTPHelper} from "./http";
 import {AccessToken, Account, Counterparty, Transaction} from "./types";
@@ -28,10 +27,8 @@ function getAccessCode(): Promise<string> {
 
 /** Client class to wrap all interactions with the api for the user */
 export class Client {
-    private readonly filename: string;
     private readonly http: HTTPHelper;
-    private authenticated: boolean;
-    private token: AccessToken | null;
+    private token: AccessToken | null = null;
 
     /**
      * Create a client
@@ -41,26 +38,20 @@ export class Client {
      */
     constructor(private readonly clientId: string, private readonly dev: boolean, private readonly privateKey: string) {
         this.http = new HTTPHelper(this.clientId, this.dev);
-        this.authenticated = false;
-        this.filename = "./access_token.json";
-        this.token = this.readToken();
     }
     /**
      * Authenticates with the Revolut API. Needs to be called before using anything else in the client.
-     * @return - true if the client is authenticated, false if it is not.
+     * @param token - the existing AccessToken, if any.
+     * @return a new or existing AccessToken, or null if the client fails to authenticate
      */
-    public async authenticate(): Promise<boolean> {
-        const token = this.readToken();
-        if (!token) {
+    public async authenticate(token: AccessToken | null): Promise<AccessToken | null> {
+        if (token == null) {
             const authCode = await getAccessCode();
-            const response = await this.http.exchangeAccessCode(authCode, this.privateKey);
-            this.setToken(response);
-            this.authenticated = true;
-            return true;
+            this.token = await this.http.exchangeAccessCode(authCode, this.privateKey);
+            return this.token;
         } else {
-            // await this.refreshToken();
-            this.authenticated = true;
-            return true;
+            this.token = token;
+            return token;
         }
     }
     /**
@@ -86,7 +77,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getAccounts(): Promise<Account[]> {
-        if (!this.authenticated || this.token == null) {
+        if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getAccounts(this.token);
@@ -97,7 +88,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getCounterparties(): Promise<Counterparty[]> {
-        if (!this.authenticated || this.token == null) {
+        if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparties(this.token);
@@ -109,7 +100,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getCounterparty(id: string): Promise<Counterparty> {
-        if (!this.authenticated || this.token == null) {
+        if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparty(this.token, id);
@@ -126,7 +117,7 @@ export class Client {
      */
     public getTransactions(from?: string, to?: string, count?: number,
                            counterpartyID?: string): Promise<Transaction[]> {
-        if (!this.authenticated || this.token == null) {
+        if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         // Limit of the api for count is 1000, going to struggle if we need to get more than this
@@ -139,31 +130,10 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getTransaction(id: string): Promise<Transaction> {
-        if (!this.authenticated || this.token == null) {
+        if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getTransaction(this.token, id);
-    }
-    /**
-     * Reads token from disk
-     * @return - AccessToken or null depending on if the token was able to be loaded
-     */
-    private readToken(): AccessToken | null {
-        try {
-            const rawData = readFileSync(this.filename, "utf-8");
-            const data = JSON.parse(rawData);
-            return data as AccessToken;
-        } catch (err) {
-            return null;
-        }
-    }
-    /**
-     * Sets the param token as the current access token. Writes this to disk and sets it in the class
-     * @param token - the AccessToken object for the api
-     */
-    private setToken(token: AccessToken): void {
-        writeFileSync(this.filename, JSON.stringify(token));
-        this.token = token;
     }
     // /**
     //  * Refresh the access token asynchronously

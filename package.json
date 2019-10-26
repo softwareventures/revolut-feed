@@ -18,7 +18,7 @@
   "scripts": {
     "semantic-release": "semantic-release",
     "test": "tsc && tslint --project . && ava",
-    "start": "ts-node ."
+    "start": "ts-node --files ."
   },
   "dependencies": {
     "@softwareventures/array": "0.16.1",
@@ -34,6 +34,7 @@
     "dictionary-types": "1.0.0",
     "dotenv": "8.2.0",
     "jsonwebtoken": "8.5.1",
+    "promise-fs": "^2.1.1",
     "request": "2.88.0",
     "request-promise-native": "1.0.7"
   },
