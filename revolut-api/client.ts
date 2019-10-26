@@ -31,7 +31,7 @@ export class Client {
     private readonly filename: string;
     private readonly http: HTTPHelper;
     private authenticated: boolean;
-    private readonly token: AccessToken | null;
+    private token: AccessToken | null;
 
     /**
      * Create a client
