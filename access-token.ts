@@ -6,7 +6,7 @@ import {AccessToken} from "./revolut-api/types";
  */
 export function readAccessToken(filename: string): Promise<AccessToken | null> {
     return readFile(filename, "utf-8")
-        .then(JSON.parse)
+        .then(token => JSON.parse(token))
         .catch(() => null);
 }
 
