@@ -12,7 +12,6 @@ import {AccessToken, Options} from "./types";
 export class HTTPHelper {
     private readonly apiRoot: string;
     private readonly localhost: string;
-    private readonly clientId: string;
     private readonly clientAssertionType: string;
 
     /**
@@ -20,8 +19,7 @@ export class HTTPHelper {
      * @param clientId - the client id from the revolut api app
      * @param dev - true or false for if the client is in development mode
      */
-    constructor(clientId: string, dev: boolean) {
-        this.clientId = clientId;
+    constructor(private readonly clientId: string, dev: boolean) {
         const apiSubDomain = dev
             ? "sandbox-b2b"
             : "b2b";
