@@ -1,3 +1,4 @@
+import {filter, reverse} from "@softwareventures/array";
 import * as csv from "@softwareventures/csv";
 import {recordsToTable} from "@softwareventures/table";
 import program = require("commander");
@@ -49,7 +50,7 @@ function reverseDateFormat(date: string): string {
  * @return - One leg from the transaction
  * @throws an error if there is no GBP account with the user
  */
-function getLeg(legs: Leg[]): Leg {
+function getLeg(legs: ReadonlyArray<Leg>): Leg {
     if (legs.length === 1) {
         return legs[0];
     }
@@ -85,34 +86,45 @@ function createTableRow(transaction: Transaction, leg: Leg): ReadonlyDictionary<
 }
 
 /**
- * Finds matching foreign transaction to exchange transaction from a list of foreign transactions
- * @param exTrans - Exchange transaction from foreign currency => GBP
- * @param forTransactions - An array of foreign transactions that have happened before this exchange transaction
- * @return - exTrans with some modified meta data based on the foreign transaction
+ * Finds matching foreign transaction to exchange transaction from a list of
+ * foreign transactions. Update the exchange transaction with details from the
+ * foreign transaction, and remove the foreign transaction from the list of
+ * foreign transactions.
+ *
+ * @param exchangeTransaction - Exchange transaction from foreign currency to GBP
+ * @param foreignTransactions - An array of foreign transactions that have
+ *   happened before this exchange transaction
+ * @return Null if there is no match, otherwise the updated exchange
+ *   transaction, and the array of foreign transactions with the matching
+ *   transaction removed.
  */
-function findForeignTrans(exTrans: Transaction,
-                          forTransactions: Transaction[]): Transaction | false {
+function matchForeignTransaction(exchangeTransaction: Transaction, foreignTransactions: ReadonlyArray<Transaction>): {
+    updatedTransaction: Transaction,
+    otherForeignTransactions: Transaction[]
+} | null {
     // This for loop works because the transactions are listed from oldest to newest
-    for (const forTrans of forTransactions) {
-        for (const leg of exTrans.legs) {
+    for (const foreignTransaction of foreignTransactions) {
+        for (const leg of exchangeTransaction.legs) {
             // This leg is the foreign currency leg of the exchange and the amount in the transaction is the same
             // Number is a negative version of the topup transaction, so needs to be made positive
             const legAmount = leg.amount * -1;
-            if (leg.currency !== "GBP" && legAmount === forTrans.legs[0].amount) {
-                const currency: string = forTrans.legs[0].currency;
-                const amount: string = forTrans.legs[0].amount.toFixed(2);
-                //
-                exTrans.reference = forTrans.legs[0].description + ` (FX ${currency} ${amount})`;
-                // Remove this transaction out of the list
-                forTransactions.splice(forTransactions.indexOf(forTrans), 1);
-                return exTrans;
+            if (leg.currency !== "GBP" && legAmount === foreignTransaction.legs[0].amount) {
+                const currency: string = foreignTransaction.legs[0].currency;
+                const amount: string = foreignTransaction.legs[0].amount.toFixed(2);
+
+                return {
+                    updatedTransaction: {
+                        ...exchangeTransaction,
+                        reference: foreignTransaction.legs[0].description + ` (FX ${currency} ${amount})`
+                    },
+                    otherForeignTransactions: filter(foreignTransactions, t => t !== foreignTransaction)
+                };
             }
         }
     }
-    console.warn(
-        `Could not find equiv of foreign exchange: "${exTrans.legs[0].description}" on ${exTrans.completed_at}`
-    );
-    return false;
+    console.warn(`Could not find equiv of foreign exchange: "${exchangeTransaction.legs[0].description}" `
+        + `on ${exchangeTransaction.completed_at}`);
+    return null;
 }
 
 /**
@@ -121,11 +133,11 @@ function findForeignTrans(exTrans: Transaction,
  * @param transactions - An array of transactions to insert into the csv table
  * @return An array of dictionaries with string keys
  */
-function createTable(acc: Account, transactions: Transaction[]): Array<ReadonlyDictionary<string>> {
+function createTable(acc: Account, transactions: ReadonlyArray<Transaction>): Array<ReadonlyDictionary<string>> {
     const tableRows: Array<ReadonlyDictionary<string>> = [];
-    const foreignTrans: Transaction[] = [];
+    let foreignTrans: Transaction[] = [];
     // reversed as we need to insert transactions oldest first and they are in the array newest first
-    for (const transaction of transactions.reverse()) {
+    for (const transaction of reverse(transactions)) {
         const leg: Leg = getLeg(transaction.legs);
         // Non-GBP transactions will be added to foreignTrans for future search of exchange transactions
         if (transaction.state === "completed") {
@@ -135,9 +147,10 @@ function createTable(acc: Account, transactions: Transaction[]): Array<ReadonlyD
             } else {
                 if (transaction.type === "exchange") {
                     // Is an exchange from a foreign currency account
-                    const trans = findForeignTrans(transaction, foreignTrans);
-                    if (trans) {
-                        tableRows.push(createTableRow(trans, leg));
+                    const match = matchForeignTransaction(transaction, foreignTrans);
+                    if (match) {
+                        tableRows.push(createTableRow(match.updatedTransaction, leg));
+                        foreignTrans = match.otherForeignTransactions;
                     }
                 } else {
                     // Can just be added to the table, no adjustments required
