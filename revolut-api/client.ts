@@ -31,7 +31,7 @@ export class Client {
     private readonly filename: string;
     private http: HTTPHelper;
     private authenticated: boolean;
-    private token: AccessToken;
+    private token: AccessToken | null;
 
     /**
      * Create a client
@@ -43,14 +43,14 @@ export class Client {
         this.http = new HTTPHelper(this.clientId, this.dev);
         this.authenticated = false;
         this.filename = "./access_token.json";
-        this.token = this.readToken() as AccessToken;
+        this.token = this.readToken();
     }
     /**
      * Authenticates with the Revolut API. Needs to be called before using anything else in the client.
      * @return - true if the client is authenticated, false if it is not.
      */
     public async authenticate(): Promise<boolean> {
-        const token: AccessToken | false = this.readToken();
+        const token = this.readToken();
         if (!token) {
             const authCode = await getAccessCode();
             const response = await this.http.exchangeAccessCode(authCode, this.privateKey);
@@ -86,7 +86,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getAccounts(): Promise<Account[]> {
-        if (!this.authenticated) {
+        if (!this.authenticated || this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getAccounts(this.token);
@@ -97,7 +97,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getCounterparties(): Promise<Counterparty[]> {
-        if (!this.authenticated) {
+        if (!this.authenticated || this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparties(this.token);
@@ -109,7 +109,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getCounterparty(id: string): Promise<Counterparty> {
-        if (!this.authenticated) {
+        if (!this.authenticated || this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparty(this.token, id);
@@ -126,7 +126,7 @@ export class Client {
      */
     public getTransactions(from?: string, to?: string, count?: number,
                            counterpartyID?: string): Promise<Transaction[]> {
-        if (!this.authenticated) {
+        if (!this.authenticated || this.token == null) {
             throw new Error("Not Authenticated");
         }
         // Limit of the api for count is 1000, going to struggle if we need to get more than this
@@ -139,7 +139,7 @@ export class Client {
      * @throws error if the client is not authenticated
      */
     public getTransaction(id: string): Promise<Transaction> {
-        if (!this.authenticated) {
+        if (!this.authenticated || this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getTransaction(this.token, id);
@@ -148,13 +148,13 @@ export class Client {
      * Reads token from disk
      * @return - AccessToken or false depending on if the token was able to be loaded
      */
-    private readToken(): AccessToken | false {
+    private readToken(): AccessToken | null {
         try {
             const rawData = readFileSync(this.filename, "utf-8");
             const data = JSON.parse(rawData);
             return data as AccessToken;
         } catch (err) {
-            return false;
+            return null;
         }
     }
     /**
