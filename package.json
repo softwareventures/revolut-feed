@@ -34,7 +34,7 @@
     "dictionary-types": "1.0.0",
     "dotenv": "8.2.0",
     "jsonwebtoken": "8.5.1",
-    "promise-fs": "^2.1.1",
+    "promise-fs": "2.1.1",
     "request": "2.88.0",
     "request-promise-native": "1.0.7"
   },
