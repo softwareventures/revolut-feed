@@ -11,7 +11,6 @@ import {AccessToken, Options} from "./types";
 
 /** Class to wrap all http requests with to make code simpler */
 export class HTTPHelper {
-    public readonly subDomain: string;
     public readonly apiSubDomain: string;
     public readonly apiRoot: string;
     private readonly localhost: string;
@@ -27,10 +26,8 @@ export class HTTPHelper {
         this.clientId = clientId;
         if (dev) {
             this.apiSubDomain = "sandbox-b2b";
-            this.subDomain = "sandbox-business";
         } else {
             this.apiSubDomain = "b2b";
-            this.subDomain = "business";
         }
         this.apiRoot = `https://${this.apiSubDomain}.revolut.com/api/1.0/`;
         this.clientAssertionType = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
