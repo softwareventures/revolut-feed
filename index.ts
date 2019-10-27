@@ -198,12 +198,11 @@ readAccessToken("access_token.json")
                 .then(() => client.getGBPAccount());
         }
     })
-    .then(async account => {
-        // Write to csv here
-        const transactions = await client.getTransactions(program.from, program.to, 1000);
-        const rows = createTable(account, transactions);
-        return writeFile(program.output, csv.write(recordsToTable(rows)));
-    })
+    .then(account => client.getTransactions(program.from, program.to, 1000)
+        .then(transactions => createTable(account, transactions)))
+    .then(recordsToTable)
+    .then(table => csv.write(table))
+    .then(text => writeFile(program.output, text))
     .then(() => {
         console.log("wrote csv to " + program.output);
         process.exit(0);
