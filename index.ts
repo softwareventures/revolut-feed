@@ -170,7 +170,7 @@ function createTable(acc: Account, transactions: ReadonlyArray<Transaction>): Ar
     for (const foreignTransaction of foreignTrans) {
         console.warn("Could not find matching exchange for foreign transaction: "
             + `"${foreignTransaction.legs[0].description}" `
-            + `${foreignTransaction.legs[0].currency} ${(-foreignTransaction.legs[0].amount).toFixed(2)} `
+            + `${foreignTransaction.legs[0].currency} ${(foreignTransaction.legs[0].amount).toFixed(2)} `
             + `on ${foreignTransaction.completed_at}`);
     }
     return tableRows;
