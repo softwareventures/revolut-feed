@@ -4,7 +4,7 @@ import {recordsToTable} from "@softwareventures/table";
 import program = require("commander");
 import {ReadonlyDictionary} from "dictionary-types";
 import * as dotenv from "dotenv";
-import {writeFileSync} from "fs";
+import {writeFile} from "fs-extra";
 import {readAccessToken, readAuthCode, writeAccessToken} from "./authentication";
 import {version} from "./package.json";
 import {Account, Client, Leg, Transaction} from "./revolut-api";
@@ -202,7 +202,9 @@ readAccessToken("access_token.json")
         // Write to csv here
         const transactions = await client.getTransactions(program.from, program.to, 1000);
         const rows = createTable(account, transactions);
-        writeFileSync(program.output, csv.write(recordsToTable(rows)));
+        return writeFile(program.output, csv.write(recordsToTable(rows)));
+    })
+    .then(() => {
         console.log("wrote csv to " + program.output);
         process.exit(0);
     })
