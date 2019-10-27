@@ -3,26 +3,8 @@
  * @file Handles the client that users interact with the api with
  */
 
-import * as readline from "readline";
 import {HTTPHelper} from "./http";
 import {AccessToken, Account, Counterparty, Transaction} from "./types";
-
-/**
- * Handles the terminal input for the access code from the user
- * @return - the user input as a string promise.
- */
-function getAccessCode(): Promise<string> {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-    return new Promise(resolve => {
-        rl.question("Enter Access Code: ", (accessCode) => {
-            rl.close();
-            resolve(accessCode);
-        });
-    });
-}
 
 
 /** Client class to wrap all interactions with the api for the user */
@@ -42,11 +24,14 @@ export class Client {
     /**
      * Authenticates with the Revolut API. Needs to be called before using anything else in the client.
      * @param token - the existing AccessToken, if any.
+     * @param readAuthCode - a function that will be called if necessary to read an authorization code
+     *   input by the user.
      * @return a new or existing AccessToken, or null if the client fails to authenticate
      */
-    public async authenticate(token: AccessToken | null): Promise<AccessToken | null> {
+    public async authenticate(token: AccessToken | null,
+                              readAuthCode: () => Promise<string>): Promise<AccessToken | null> {
         if (token == null) {
-            const authCode = await getAccessCode();
+            const authCode = await readAuthCode();
             this.token = await this.http.exchangeAccessCode(authCode, this.privateKey);
             return this.token;
         } else {

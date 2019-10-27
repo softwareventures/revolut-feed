@@ -5,7 +5,7 @@ import program = require("commander");
 import {ReadonlyDictionary} from "dictionary-types";
 import * as dotenv from "dotenv";
 import {writeFileSync} from "fs";
-import {readAccessToken, writeAccessToken} from "./access-token";
+import {readAccessToken, readAuthCode, writeAccessToken} from "./authentication";
 import {version} from "./package.json";
 import {Account, Client, Leg, Transaction} from "./revolut-api";
 
@@ -188,7 +188,7 @@ function createTable(acc: Account, transactions: ReadonlyArray<Transaction>): Ar
 
 // Main Flow
 readAccessToken("access_token.json")
-    .then(accessToken => client.authenticate(accessToken))
+    .then(accessToken => client.authenticate(accessToken, readAuthCode))
     .then(accessToken => {
         if (accessToken == null) {
             throw new Error("Authentication failed");

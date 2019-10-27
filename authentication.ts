@@ -1,4 +1,5 @@
 import {readFile, writeFile} from "fs-extra";
+import * as readline from "readline";
 import {AccessToken} from "./revolut-api/types";
 
 /**
@@ -15,4 +16,21 @@ export function readAccessToken(filename: string): Promise<AccessToken | null> {
  */
 export function writeAccessToken(filename: string, token: AccessToken): Promise<void> {
     return writeFile(filename, JSON.stringify(token), "utf-8");
+}
+
+/**
+ * Reads auth code from terminal input.
+ * @return - the user input as a string promise.
+ */
+export function readAuthCode(): Promise<string> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    return new Promise(resolve => {
+        rl.question("Enter Access Code: ", (accessCode) => {
+            rl.close();
+            resolve(accessCode);
+        });
+    });
 }
