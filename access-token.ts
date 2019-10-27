@@ -1,4 +1,4 @@
-import {readFile, writeFile} from "promise-fs";
+import {readFile, writeFile} from "fs-extra";
 import {AccessToken} from "./revolut-api/types";
 
 /**
