@@ -32,7 +32,7 @@
     "@types/request": "2.48.3",
     "@types/request-promise-native": "1.0.17",
     "commander": "3.0.2",
-    "dictionary-types": "1.0.0",
+    "dictionary-types": "1.0.1",
     "dotenv": "8.2.0",
     "fs-extra": "8.1.0",
     "jsonwebtoken": "8.5.1",
