@@ -37,7 +37,7 @@
     "fs-extra": "8.1.0",
     "jsonwebtoken": "8.5.1",
     "request": "2.88.0",
-    "request-promise-native": "1.0.7"
+    "request-promise-native": "1.0.8"
   },
   "devDependencies": {
     "@softwareventures/tsconfig": "2.1.0",
