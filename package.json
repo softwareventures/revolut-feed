@@ -27,7 +27,7 @@
     "@types/commander": "2.12.2",
     "@types/dotenv": "6.1.1",
     "@types/fs-extra": "8.0.1",
-    "@types/jsonwebtoken": "8.3.5",
+    "@types/jsonwebtoken": "8.3.6",
     "@types/node": "12.12.24",
     "@types/request": "2.48.4",
     "@types/request-promise-native": "1.0.17",
