@@ -258,7 +258,7 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
   integrity sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==
 
-"@softwareventures/array@0.19.0":
+"@softwareventures/array@0.19.0", "@softwareventures/array@^0.19.0":
   version "0.19.0"
   resolved "https://registry.yarnpkg.com/@softwareventures/array/-/array-0.19.0.tgz#81a906738a5a931f88e71509fa00c588f641be31"
   integrity sha512-TVzIEw5yD3cOYBKDJOS4JExjK2u0SRj3hspSU1o11fQ7U2uD5w0MXy7z4GVCkRJ6l3DedTcSzQzfKAiuZvGv7g==
@@ -267,21 +267,12 @@
     dictionary-types "^1.0.0"
     tslib "^1.9.3"
 
-"@softwareventures/array@^0.18.0":
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/@softwareventures/array/-/array-0.18.0.tgz#69588371b88a8e995736c79ae534667e60e88eb5"
-  integrity sha512-JRHT1dVwPqFheXk8USYQXFpQgWA6IiCDMIy4ZIoMaeBbEusWI1QhhQ6Ddkz9FZamDW+Cqad7B2TS0BeUNYc9zw==
+"@softwareventures/csv@0.1.18":
+  version "0.1.18"
+  resolved "https://registry.yarnpkg.com/@softwareventures/csv/-/csv-0.1.18.tgz#2759a8d14cdab8b677b56875aab3d54e6534af4a"
+  integrity sha512-nMXt3ULADplXsDTErHmpPuBz2RGW2A/gN244NWgh8mi6Vd3SlSHJgMd4wKcUcwu40GFmLP3CW8GNjMkAJc6QHg==
   dependencies:
-    "@softwareventures/ordered" "^0.2.0"
-    dictionary-types "^1.0.0"
-    tslib "^1.9.3"
-
-"@softwareventures/csv@0.1.17":
-  version "0.1.17"
-  resolved "https://registry.yarnpkg.com/@softwareventures/csv/-/csv-0.1.17.tgz#7c7706a43efbe910eb688eac5215f2fc47339919"
-  integrity sha512-CZZDOrWf19c8BqwkxUj+xZrRHUA8mAo3q0+/OprGMJV+rNu0V5sNQBn2Ch602HM5AtO4cbmDOYYy4jEJ2fDVCQ==
-  dependencies:
-    "@softwareventures/array" "^0.18.0"
+    "@softwareventures/array" "^0.19.0"
     "@softwareventures/table" "^0.1.2"
     escape-string-regexp "^2.0.0"
     tslib "^1.9.3"
