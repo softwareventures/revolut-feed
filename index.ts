@@ -189,7 +189,7 @@ function createTable(acc: Account, transactions: ReadonlyArray<Transaction>): Ar
 // Main Flow
 readAccessToken("access_token.json")
     .then(accessToken => client.authenticate(accessToken, readAuthCode))
-    .then(accessToken => {
+    .then(async accessToken => {
         if (accessToken == null) {
             throw new Error("Authentication failed");
         } else {

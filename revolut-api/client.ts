@@ -1,4 +1,3 @@
-
 /**
  * @file Handles the client that users interact with the api with
  */
@@ -21,6 +20,7 @@ export class Client {
     constructor(private readonly clientId: string, private readonly dev: boolean, private readonly privateKey: string) {
         this.http = new HTTPHelper(this.clientId, this.dev);
     }
+
     /**
      * Authenticates with the Revolut API. Needs to be called before using anything else in the client.
      * @param token - the existing AccessToken, if any.
@@ -39,12 +39,13 @@ export class Client {
             return token;
         }
     }
+
     /**
      * Assuming the user has only one GBP account, gets that account
      * @return - promise of of an Account object
      * @throws error if the user has no GBP bank account
      */
-    public getGBPAccount(): Promise<Account> {
+    public async getGBPAccount(): Promise<Account> {
         return this.getAccounts()
             .then(accounts => {
                 for (const account of accounts) {
@@ -56,40 +57,44 @@ export class Client {
                 throw new Error("No GBP account for logged in user.");
             });
     }
+
     /**
      * Gets all of the users bank accounts
      * @return - promise of an array of Account objects
      * @throws error if the client is not authenticated
      */
-    public getAccounts(): Promise<Account[]> {
+    public async getAccounts(): Promise<Account[]> {
         if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getAccounts(this.token);
     }
+
     /**
      * Gets all of the counterparties of the user
      * @return - promise of an array of Counterparty objects
      * @throws error if the client is not authenticated
      */
-    public getCounterparties(): Promise<Counterparty[]> {
+    public async getCounterparties(): Promise<Counterparty[]> {
         if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparties(this.token);
     }
+
     /**
      * Gets the counterparty with the specified ID
      * @param id - the id of the counterparty
      * @return - promise of a Countyparty object
      * @throws error if the client is not authenticated
      */
-    public getCounterparty(id: string): Promise<Counterparty> {
+    public async getCounterparty(id: string): Promise<Counterparty> {
         if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getCounterparty(this.token, id);
     }
+
     /**
      * Gets transactions from this user with the given filters
      * The default limit of the api is 100, the max is 1000.
@@ -100,26 +105,28 @@ export class Client {
      * @return - promise of an array of Transaction objects
      * @throws error if the client is not authenticated
      */
-    public getTransactions(from?: string, to?: string, count?: number,
-                           counterpartyID?: string): Promise<Transaction[]> {
+    public async getTransactions(from?: string, to?: string, count?: number,
+                                 counterpartyID?: string): Promise<Transaction[]> {
         if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         // Limit of the api for count is 1000, going to struggle if we need to get more than this
         return this.http.getTransactions(this.token, from, to, count, counterpartyID);
     }
+
     /**
      * Gets the Transaction with the specified ID
      * @param id - the id of the transaction
      * @return - promise of a Transaction object
      * @throws error if the client is not authenticated
      */
-    public getTransaction(id: string): Promise<Transaction> {
+    public async getTransaction(id: string): Promise<Transaction> {
         if (this.token == null) {
             throw new Error("Not Authenticated");
         }
         return this.http.getTransaction(this.token, id);
     }
+
     // /**
     //  * Refresh the access token asynchronously
     //  * @return - a void promise. This is so we don't have to deal with what getRefreshToken returns
