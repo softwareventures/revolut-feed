@@ -282,14 +282,14 @@
     dictionary-types "^1.2.0"
     tslib "^1.9.3"
 
-"@softwareventures/csv@0.1.22":
-  version "0.1.22"
-  resolved "https://registry.yarnpkg.com/@softwareventures/csv/-/csv-0.1.22.tgz#ba21e638a6a62b6fd42b5faaa6bbe2a8059aefa0"
-  integrity sha512-+ToOLzXDGK3E8zR1T58wva+x8rlPe/6PlUth9HeKt1bVXlcV7rBj4qwswrHlN6f0jrtuWo5hMYz8jz6t6C5lDA==
+"@softwareventures/csv@0.1.23":
+  version "0.1.23"
+  resolved "https://registry.yarnpkg.com/@softwareventures/csv/-/csv-0.1.23.tgz#a4814695bbc9efefb2c44fc8de28a99b47f790c6"
+  integrity sha512-3uujZ0ghVJ3cY4QmLKkHzjl4zagUBBiEckHN0Y3/XcnVsPtdG8zFAp3n/U9h/qQMFSC7ABKD6IOgXszm4Voraw==
   dependencies:
     "@softwareventures/array" "^0.31.0"
     "@softwareventures/table" "^0.1.2"
-    escape-string-regexp "^2.0.0"
+    escape-string-regexp "^3.0.0"
     tslib "^1.9.3"
 
 "@softwareventures/dictionary@^0.6.0":
@@ -2066,6 +2066,11 @@ escape-string-regexp@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-2.0.0.tgz#a30304e99daa32e23b2fd20f51babd07cffca344"
   integrity sha512-UpzcLCXolUWcNu5HtVMHYdXJjArjsF9C0aNnquZYY4uW/Vu0miy5YoWvbV345HauVvcAUnpRuhMMcqTcGOY2+w==
+
+escape-string-regexp@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-3.0.0.tgz#1dad9cc28aed682be0de197280f79911a5fccd61"
+  integrity sha512-11dXIUC3umvzEViLP117d0KN6LJzZxh5+9F4E/7WLAAw7GrHk8NpUR+g9iJi/pe9C0py4F8rs0hreyRCwlAuZg==
 
 esprima@^4.0.0, esprima@~4.0.0:
   version "4.0.1"
