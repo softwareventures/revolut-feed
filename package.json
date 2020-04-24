@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@softwareventures/array": "0.31.0",
-    "@softwareventures/csv": "0.1.23",
+    "@softwareventures/csv": "0.1.24",
     "@softwareventures/table": "0.1.4",
     "@types/commander": "2.12.2",
     "@types/dotenv": "6.1.1",
