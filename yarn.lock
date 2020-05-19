@@ -307,13 +307,13 @@
   dependencies:
     tslib "^1.9.3"
 
-"@softwareventures/table@0.1.4", "@softwareventures/table@^0.1.2":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@softwareventures/table/-/table-0.1.4.tgz#ca0b4cfaec89d7b3ab6efa7bdebd4b9290acab44"
-  integrity sha512-0H4eUzjhFEhvqcBM7zCMZ/+KTjTfETcqsuJObT7gobLVCjCur5R3sfO2V/r5FmbVYM9dC/Sjwh+CzZzF/DKLwQ==
+"@softwareventures/table@0.1.5", "@softwareventures/table@^0.1.2":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@softwareventures/table/-/table-0.1.5.tgz#c7867b591b5854b054fa0be88c6281c5a4d5a01a"
+  integrity sha512-SupVivOWyqFPWP17GHhNK4lBMH99PnyJt9Py1MmegLyYRmOuEKZSLQbQHlS2N1pkQhqdXDJAH7gfaaqtbGp2dw==
   dependencies:
     dictionary-types "^1.0.0"
-    tslib "^1.9.3"
+    tslib "^1.9.3 || ^2.0.0"
 
 "@softwareventures/tsconfig@2.2.0":
   version "2.2.0"
