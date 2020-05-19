@@ -282,15 +282,15 @@
     dictionary-types "^1.2.0"
     tslib "^1.9.3 || ^2.0.0"
 
-"@softwareventures/csv@0.1.24":
-  version "0.1.24"
-  resolved "https://registry.yarnpkg.com/@softwareventures/csv/-/csv-0.1.24.tgz#744ab0f2615c87991993b21b182269e9eda13b3c"
-  integrity sha512-jH+DSC11lkeYHF63zOiuu42UieBbYMGaAIUnFjL4gTIxDrFYNxAXiL9NpyP0JONHaf16WP9YUtrp82DvtAvm5g==
+"@softwareventures/csv@0.1.25":
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/@softwareventures/csv/-/csv-0.1.25.tgz#aaa2c3db1e73ec55e9e46ae4210609fee6e47bbd"
+  integrity sha512-RYsmyhxPc0+xeeFJUdm4BuseVd5nn7jjsLn/C6DTHDHKKwjjgy2CaWm10safzfW7cowZF36ZsDE5/SSSk0yr8g==
   dependencies:
     "@softwareventures/array" "^0.31.0"
     "@softwareventures/table" "^0.1.2"
     escape-string-regexp "^4.0.0"
-    tslib "^1.9.3"
+    tslib "^1.9.3 || ^2.0.0"
 
 "@softwareventures/dictionary@^0.6.0":
   version "0.6.0"
