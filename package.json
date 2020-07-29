@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@softwareventures/array": "0.33.1",
+    "@softwareventures/chain": "0.1.2",
     "@softwareventures/csv": "0.1.26",
     "@softwareventures/table": "0.1.5",
     "@types/commander": "2.12.2",

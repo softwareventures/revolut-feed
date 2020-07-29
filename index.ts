@@ -1,4 +1,5 @@
-import {filter, reverse} from "@softwareventures/array";
+import {contains, filter, filterFn, mapFn, reverse, uniqueByIdentity} from "@softwareventures/array";
+import chain from "@softwareventures/chain";
 import * as csv from "@softwareventures/csv";
 import {recordsToTable} from "@softwareventures/table";
 import program = require("commander");
@@ -97,36 +98,97 @@ function createTableRow(transaction: Transaction, leg: Leg): ReadonlyDictionary<
  *   transaction, and the array of foreign transactions with the matching
  *   transaction removed.
  */
-function matchForeignTransaction(exchangeTransaction: Transaction, foreignTransactions: ReadonlyArray<Transaction>): {
+function matchForeignTransactions(exchangeTransaction: Transaction, foreignTransactions: ReadonlyArray<Transaction>): {
     updatedTransaction: Transaction,
     otherForeignTransactions: Transaction[]
 } | null {
-    // This for loop works because the transactions are listed from oldest to newest
-    for (const foreignTransaction of foreignTransactions) {
-        for (const foreignLeg of exchangeTransaction.legs) {
-            // This leg is the foreign currency leg of the exchange and the amount in the transaction is the same
-            // Number is a negative version of the topup transaction, so needs to be made positive
-            const legAmount = -foreignLeg.amount;
-            if (foreignLeg.currency !== "GBP" && legAmount === foreignTransaction.legs[0].amount) {
-                const currency: string = foreignTransaction.legs[0].currency;
-                const amount: string = foreignTransaction.legs[0].amount.toFixed(2);
-
-                return {
-                    updatedTransaction: {
-                        ...exchangeTransaction,
-                        reference: foreignTransaction.reference,
-                        legs: [
-                            {
-                                ...getLeg(exchangeTransaction.legs),
-                                description: foreignTransaction.legs[0].description + ` (FX ${currency} ${amount})`
-                            }
-                        ]
-                    },
-                    otherForeignTransactions: filter(foreignTransactions, t => t !== foreignTransaction)
-                };
+    function recurse(remainingForeignValue: number, subsequentForeignTransactions: ReadonlyArray<Transaction>): Transaction[] | null {
+        for (let i = 0; i < subsequentForeignTransactions.length; ++i) {
+            const foreignTransaction = subsequentForeignTransactions[i];
+            if (foreignTransaction.legs[0].amount === remainingForeignValue) {
+                return [foreignTransaction];
+            } else if (foreignTransaction.legs[0].amount < remainingForeignValue) {
+                const additionalTransactions = recurse(remainingForeignValue - foreignTransaction.legs[0].amount,
+                    subsequentForeignTransactions.slice(i + 1));
+                if (additionalTransactions != null) {
+                    return [foreignTransaction, ...additionalTransactions];
+                }
             }
         }
+
+        return null;
     }
+
+    const foreignLegs = filter(exchangeTransaction.legs, leg => leg.currency !== "GBP");
+    if (foreignLegs.length > 1) {
+        console.warn("Foreign exchange transaction with multiple foreign legs: "
+            + `"${exchangeTransaction.legs[0].description}" `
+            + `${exchangeTransaction.legs[0].currency} ${(-exchangeTransaction.legs[0].amount).toFixed(2)} `
+            + `to ${exchangeTransaction.legs[1].currency} ${exchangeTransaction.legs[1].amount.toFixed(2)} `
+            + `on ${exchangeTransaction.completed_at}`);
+    } else if (foreignLegs.length === 0) {
+        console.warn("Foreign exchange transaction with no foreign legs: "
+            + `"${exchangeTransaction.legs[0].description}" `
+            + `${exchangeTransaction.legs[0].currency} ${(-exchangeTransaction.legs[0].amount).toFixed(2)} `
+            + `to ${exchangeTransaction.legs[1].currency} ${exchangeTransaction.legs[1].amount.toFixed(2)} `
+            + `on ${exchangeTransaction.completed_at}`);
+    }
+    const foreignLeg = foreignLegs[0];
+    const foreignCurrency = foreignLeg.currency;
+    const foreignAmount = -foreignLeg.amount;
+
+    const transactionsInForeignCurrency = filter(foreignTransactions,
+        transaction => transaction.legs[0].currency === foreignCurrency);
+
+    // This for loop works because the transactions are listed from oldest to newest
+    for (const foreignTransaction of transactionsInForeignCurrency) {
+        if (foreignAmount === foreignTransaction.legs[0].amount) {
+            return {
+                updatedTransaction: {
+                    ...exchangeTransaction,
+                    reference: foreignTransaction.reference,
+                    legs: [
+                        {
+                            ...getLeg(exchangeTransaction.legs),
+                            description: foreignTransaction.legs[0].description
+                                + ` (FX ${foreignCurrency} ${foreignAmount})`
+                        }
+                    ]
+                },
+                otherForeignTransactions: filter(foreignTransactions, t => t !== foreignTransaction)
+            };
+        }
+    }
+
+    // If we can't match against a single foreign transaction, try to match against multiple
+    const matchingTransactions = recurse(foreignAmount, transactionsInForeignCurrency);
+    if (matchingTransactions != null) {
+        const reference = chain(matchingTransactions)
+            .map(mapFn(transaction => transaction.reference))
+            .map(uniqueByIdentity)
+            .map(filterFn(reference => reference != null && !reference.match(/^\s*$/)))
+            .value.join(", ");
+        const description = chain(matchingTransactions)
+            .map(mapFn(transaction => transaction.legs[0].description))
+            .map(uniqueByIdentity)
+            .value.join(", ");
+
+        return {
+            updatedTransaction: {
+                ...exchangeTransaction,
+                reference,
+                legs: [
+                    {
+                        ...getLeg(exchangeTransaction.legs),
+                        description: `${description} (FX ${foreignCurrency} ${foreignAmount})`
+                    }
+                ]
+            },
+            otherForeignTransactions: filter(foreignTransactions,
+                transaction => !contains(matchingTransactions, transaction))
+        };
+    }
+
     console.warn("Could not find matching foreign transaction for exchange: "
         + `"${exchangeTransaction.legs[0].description}" `
         + `${exchangeTransaction.legs[0].currency} ${(-exchangeTransaction.legs[0].amount).toFixed(2)} `
@@ -155,7 +217,7 @@ function createTable(acc: Account, transactions: ReadonlyArray<Transaction>): Ar
             } else {
                 if (transaction.type === "exchange") {
                     // Is an exchange from a foreign currency account
-                    const match = matchForeignTransaction(transaction, foreignTrans);
+                    const match = matchForeignTransactions(transaction, foreignTrans);
                     if (match) {
                         tableRows.push(createTableRow(match.updatedTransaction, match.updatedTransaction.legs[0]));
                         foreignTrans = match.otherForeignTransactions;
