@@ -108,7 +108,7 @@ export interface Transaction {
     readonly created_at: string;
     readonly updated_at: string;
     readonly completed_at: string;
-    readonly reference: string;
+    readonly reference?: string;
     readonly legs: ReadonlyArray<Leg>;
     readonly scheduled_for: string;
 }
