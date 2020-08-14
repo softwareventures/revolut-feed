@@ -21,7 +21,7 @@
     "start": "ts-node --files ."
   },
   "dependencies": {
-    "@softwareventures/array": "0.33.1",
+    "@softwareventures/array": "3.0.0",
     "@softwareventures/chain": "0.1.2",
     "@softwareventures/csv": "0.1.26",
     "@softwareventures/table": "0.1.5",
