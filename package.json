@@ -23,7 +23,7 @@
   "dependencies": {
     "@softwareventures/array": "3.0.0",
     "@softwareventures/chain": "0.1.2",
-    "@softwareventures/csv": "0.1.26",
+    "@softwareventures/csv": "0.1.27",
     "@softwareventures/table": "0.1.5",
     "@types/commander": "2.12.2",
     "@types/dotenv": "6.1.1",
