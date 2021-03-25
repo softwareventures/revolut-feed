@@ -1,7 +1,9 @@
 
 # revolut-feed
 
-Experimental feed of transactions from Revolut 
+Experimental feed of transactions from Revolut.
+
+**This project is OBSOLETE. Crunch implemented their own transaction feed via Open Banking API, which is compatible with Revolut.** 
 
 ## Setup
 
